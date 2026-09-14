@@ -1,0 +1,24 @@
+{
+  "name": "solarshare-contracts",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test nodejs",
+    "node": "hardhat node",
+    "deploy:local": "hardhat ignition deploy ignition/modules/SolarShare.ts"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ignition": "^3.0.0",
+    "@nomicfoundation/hardhat-toolbox-viem": "^5.0.0",
+    "@nomicfoundation/hardhat-viem": "^3.0.0",
+    "@types/node": "^22.0.0",
+    "hardhat": "^3.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "viem": "^2.21.0"
+  }
+}

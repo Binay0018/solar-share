@@ -1,0 +1,49 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-800e3713075a50f999470d4d7b6eff1a1a6aea0c",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "compilerType": "solc",
+  "toolVersions": {
+    "hardhat": "3.15.0"
+  },
+  "userSourceNameMap": {
+    "contracts/SolarShare.sol": "project/contracts/SolarShare.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode.linkReferences",
+            "evm.bytecode.object",
+            "evm.bytecode.opcodes",
+            "evm.bytecode.sourceMap",
+            "evm.deployedBytecode.immutableReferences",
+            "evm.deployedBytecode.linkReferences",
+            "evm.deployedBytecode.object",
+            "evm.deployedBytecode.opcodes",
+            "evm.deployedBytecode.sourceMap",
+            "evm.methodIdentifiers"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/SolarShare.sol": {
+        "content": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.28;\r\n\r\ncontract SolarShare {\r\n    enum ParticipantRole {\r\n        None,\r\n        Prosumer,\r\n        Consumer,\r\n        Both\r\n    }\r\n\r\n    enum OfferStatus {\r\n        Open,\r\n        Matched,\r\n        Settled\r\n    }\r\n\r\n    enum TradeStatus {\r\n        Pending,\r\n        Settled\r\n    }\r\n\r\n    struct Participant {\r\n        ParticipantRole role;\r\n        bool registered;\r\n    }\r\n\r\n    struct Offer {\r\n        uint256 id;\r\n        address seller;\r\n        uint256 kWhAvailable;\r\n        uint256 pricePerKWh;\r\n        OfferStatus status;\r\n    }\r\n\r\n    struct Trade {\r\n        uint256 id;\r\n        uint256 offerId;\r\n        address seller;\r\n        address buyer;\r\n        uint256 kWhTraded;\r\n        uint256 totalPrice;\r\n        TradeStatus status;\r\n    }\r\n\r\n    uint8 public constant PROSUMER = 1;\r\n    uint8 public constant CONSUMER = 2;\r\n    uint8 public constant BOTH = 3;\r\n\r\n    uint256 public nextOfferId;\r\n    uint256 public nextTradeId;\r\n\r\n    mapping(address => Participant) public participants;\r\n    mapping(uint256 => Offer) public offers;\r\n    mapping(uint256 => Trade) public trades;\r\n\r\n    error InvalidRole();\r\n    error AlreadyRegistered();\r\n    error NotRegistered();\r\n    error NotProsumer();\r\n    error NotConsumer();\r\n    error InvalidAmount();\r\n    error OfferUnavailable();\r\n    error CannotBuyOwnOffer();\r\n    error IncorrectPayment();\r\n    error NotSeller();\r\n    error NotBuyer();\r\n    error TradeAlreadySettled();\r\n    error TransferFailed();\r\n\r\n    event ParticipantRegistered(address indexed participant, ParticipantRole role);\r\n    event OfferCreated(\r\n        uint256 indexed offerId,\r\n        address indexed seller,\r\n        uint256 kWhAvailable,\r\n        uint256 pricePerKWh\r\n    );\r\n    event TradePurchased(\r\n        uint256 indexed tradeId,\r\n        uint256 indexed offerId,\r\n        address indexed buyer,\r\n        uint256 kWhTraded,\r\n        uint256 totalPrice\r\n    );\r\n    event TradeSettled(\r\n        uint256 indexed tradeId,\r\n        uint256 indexed offerId,\r\n        address indexed seller,\r\n        address buyer,\r\n        uint256 totalPrice\r\n    );\r\n\r\n    function registerParticipant(uint8 role) external {\r\n        if (role < PROSUMER || role > BOTH) revert InvalidRole();\r\n        if (participants[msg.sender].registered) revert AlreadyRegistered();\r\n\r\n        ParticipantRole participantRole = ParticipantRole(role);\r\n        participants[msg.sender] = Participant({\r\n            role: participantRole,\r\n            registered: true\r\n        });\r\n        emit ParticipantRegistered(msg.sender, participantRole);\r\n    }\r\n\r\n    function createOffer(uint256 kWhAvailable, uint256 pricePerKWh)\r\n        external\r\n        returns (uint256 offerId)\r\n    {\r\n        _requireProsumer(msg.sender);\r\n        if (kWhAvailable == 0 || pricePerKWh == 0) revert InvalidAmount();\r\n\r\n        offerId = nextOfferId++;\r\n        offers[offerId] = Offer({\r\n            id: offerId,\r\n            seller: msg.sender,\r\n            kWhAvailable: kWhAvailable,\r\n            pricePerKWh: pricePerKWh,\r\n            status: OfferStatus.Open\r\n        });\r\n        emit OfferCreated(offerId, msg.sender, kWhAvailable, pricePerKWh);\r\n    }\r\n\r\n    function purchaseEnergy(uint256 offerId, uint256 kWh)\r\n        external\r\n        payable\r\n        returns (uint256 tradeId)\r\n    {\r\n        _requireConsumer(msg.sender);\r\n        Offer storage offer = offers[offerId];\r\n        if (offer.kWhAvailable == 0 || offer.status == OfferStatus.Settled) {\r\n            revert OfferUnavailable();\r\n        }\r\n        if (offer.seller == msg.sender) revert CannotBuyOwnOffer();\r\n        if (kWh == 0 || kWh > offer.kWhAvailable) revert InvalidAmount();\r\n\r\n        uint256 totalPrice = kWh * offer.pricePerKWh;\r\n        if (msg.value != totalPrice) revert IncorrectPayment();\r\n\r\n        offer.kWhAvailable -= kWh;\r\n        offer.status = OfferStatus.Matched;\r\n        tradeId = nextTradeId++;\r\n        trades[tradeId] = Trade({\r\n            id: tradeId,\r\n            offerId: offerId,\r\n            seller: offer.seller,\r\n            buyer: msg.sender,\r\n            kWhTraded: kWh,\r\n            totalPrice: totalPrice,\r\n            status: TradeStatus.Pending\r\n        });\r\n        emit TradePurchased(tradeId, offerId, msg.sender, kWh, totalPrice);\r\n    }\r\n\r\n    function settleTrade(uint256 tradeId) external {\r\n        Trade storage trade = trades[tradeId];\r\n        if (trade.seller == address(0)) revert OfferUnavailable();\r\n        if (msg.sender != trade.seller) revert NotSeller();\r\n        if (trade.status == TradeStatus.Settled) revert TradeAlreadySettled();\r\n\r\n        trade.status = TradeStatus.Settled;\r\n        Offer storage offer = offers[trade.offerId];\r\n        if (offer.kWhAvailable == 0) offer.status = OfferStatus.Settled;\r\n\r\n        (bool sent, ) = payable(trade.seller).call{value: trade.totalPrice}(\"\");\r\n        if (!sent) revert TransferFailed();\r\n        emit TradeSettled(\r\n            tradeId,\r\n            trade.offerId,\r\n            trade.seller,\r\n            trade.buyer,\r\n            trade.totalPrice\r\n        );\r\n    }\r\n\r\n    function _requireProsumer(address participant) internal view {\r\n        if (!participants[participant].registered) revert NotRegistered();\r\n        ParticipantRole role = participants[participant].role;\r\n        if (role != ParticipantRole.Prosumer && role != ParticipantRole.Both) {\r\n            revert NotProsumer();\r\n        }\r\n    }\r\n\r\n    function _requireConsumer(address participant) internal view {\r\n        if (!participants[participant].registered) revert NotRegistered();\r\n        ParticipantRole role = participants[participant].role;\r\n        if (role != ParticipantRole.Consumer && role != ParticipantRole.Both) {\r\n            revert NotConsumer();\r\n        }\r\n    }\r\n}\r\n"
+      }
+    }
+  }
+}

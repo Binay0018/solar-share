@@ -1,0 +1,11 @@
+{
+  "name": "solarshare-iot-simulator",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node simulator.js",
+    "once": "node simulator.js --once",
+    "day": "node simulated-day.js"
+  }
+}
