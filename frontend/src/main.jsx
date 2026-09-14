@@ -849,7 +849,7 @@ function App() {
     </main>
   );
 }
-
+// thats right
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     {window.location.pathname === "/news" ? <NewsFeed /> : <App />}
