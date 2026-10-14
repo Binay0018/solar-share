@@ -12,6 +12,7 @@ const energyOfferSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+energyOfferSchema.index({ status: 1, pricePerKWh: 1, createdAt: 1 });
 energyOfferSchema.index({ status: 1, createdAt: 1 });
 
 export default mongoose.model("EnergyOffer", energyOfferSchema);

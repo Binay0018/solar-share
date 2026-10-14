@@ -899,6 +899,40 @@ function App() {
         </article>
       </section>
 
+      {/* Consumer Request Fills */}
+      {mode === "consumer" && trades.length > 0 && (
+        <section className="consumer-fills">
+          <h2>My Request Fills</h2>
+          {trades.filter(tr => tr.fills && tr.fills.length > 0).map(tr => {
+            const totalKWh = tr.fills.reduce((s, f) => s + f.kWh, 0);
+            const avgPrice = totalKWh > 0 ? tr.fills.reduce((s, f) => s + f.kWh * f.pricePerKWh, 0) / totalKWh : 0;
+            return (
+              <div key={tr._id} className="fill-card">
+                <div className="fill-header">
+                  <span>Request: {tr.kWhNeeded} kWh @ max ₹{tr.maxPricePerKWh}/unit</span>
+                  <span className={`status-pill ${tr.status}`}>{tr.status}</span>
+                </div>
+                <div className="fill-summary">
+                  Total filled: {totalKWh.toFixed(1)} kWh @ avg ₹{avgPrice.toFixed(2)}/unit
+                </div>
+                {tr.fills.map((fill, idx) => (
+                  <div key={idx} className="fill-row">
+                    <span>{fill.sellerId.slice(0, 15)}...</span>
+                    <span>{fill.kWh} kWh @ ₹{fill.pricePerKWh}/unit</span>
+                    <span className={`status-pill ${fill.status}`}>{fill.status}</span>
+                    {fill.txHash && (
+                      <a href={`https://sepolia.etherscan.io/tx/${fill.txHash}`} target="_blank" rel="noreferrer">
+                        View tx
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </section>
+      )}
+
       {/* Footer */}
       <footer>
         <div>
