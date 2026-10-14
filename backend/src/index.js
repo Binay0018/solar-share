@@ -3,11 +3,12 @@ import dotenv from "dotenv";
 import express from "express";
 import mongoose from "mongoose";
 import { pathToFileURL } from "node:url";
+import "./env.js";
 import meterReadingRoutes from "./routes/meterReadingRoutes.js";
 import offerRoutes from "./routes/offerRoutes.js";
 import tradeRoutes from "./routes/tradeRoutes.js";
 import transactionRoutes from "./routes/transactionRoutes.js";
-import negotiationRoutes from "./routes/negotiationRoutes.js";
+
 import activityRoutes from "./routes/activityRoutes.js";
 import metricsRoutes from "./routes/metricsRoutes.js";
 
@@ -35,7 +36,7 @@ app.use("/meter-readings", meterReadingRoutes);
 app.use("/offers", offerRoutes);
 app.use("/trades", tradeRoutes);
 app.use("/transactions", transactionRoutes);
-app.use(negotiationRoutes);
+
 app.use("/activity", activityRoutes);
 app.use("/metrics", metricsRoutes);
 

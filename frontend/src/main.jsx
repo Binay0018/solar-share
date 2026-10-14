@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { isAddress } from "viem";
 import "./styles.css";
 import NewsFeed from "./NewsFeed.jsx";
-import NegotiationPanel from "./NegotiationPanel.jsx";
+
 import PurchaseButton from "./PurchaseButton.jsx";
 import { contractAddress, contractGasLimit, decodeContractEvent, ensureProsumer, getPublicClient, getWalletClient, kWhToContractUnits, priceToWei, solarShareAbi } from "./contractClient.js";
 
@@ -778,7 +778,7 @@ function App() {
                       }}
                     />
                   </div>
-                  <NegotiationPanel offer={offer} wallet={wallet} onChanged={refresh} />
+
                 </div>
               ))}
             </div>
