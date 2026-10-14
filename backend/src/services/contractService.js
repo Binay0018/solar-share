@@ -80,6 +80,120 @@ function decodeEventFromReceipt(receipt, contractAddress, eventName) {
   return decoded.args;
 }
 
+// Backend-assisted purchase only — does NOT settle.
+// The matching service uses this to create a pending trade on-chain.
+// Settlement must be done separately by the authorized seller via settleTrade.
+export async function purchaseMatchOnChain({ offer, kWhTraded }) {
+  const { contractAddress, sellerAccount, buyerAccount, sellerWallet, buyerWallet, publicClient } = getClients();
+
+  if (buyerAccount.address.toLowerCase() === sellerAccount.address.toLowerCase()) {
+    throw new Error("buyer and seller configuration wallets must be different");
+  }
+
+  let onChainOfferId;
+  let priceWei;
+
+  if (Number.isInteger(offer.onChainOfferId)) {
+    // Purchase from an existing on-chain offer
+    onChainOfferId = BigInt(offer.onChainOfferId);
+    const onChainOffer = await publicClient.readContract({
+      address: contractAddress,
+      abi: solarShareAbi,
+      functionName: "offers",
+      args: [onChainOfferId]
+    });
+    const onChainKWh = Number(onChainOffer[2]);
+    if (onChainKWh < kWhTraded) {
+      throw new Error(`On-chain offer has only ${onChainKWh} kWh available`);
+    }
+    priceWei = onChainOffer[3];
+  } else {
+    // Publish a new on-chain offer as the seller
+    priceWei = priceToWei(offer.pricePerKWh);
+    const createHash = await sellerWallet.writeContract({
+      address: contractAddress,
+      abi: solarShareAbi,
+      functionName: "createOffer",
+      args: [BigInt(kWhTraded), priceWei]
+    });
+    const createReceipt = await publicClient.waitForTransactionReceipt({ hash: createHash });
+    if (createReceipt.status !== "success") throw new Error("createOffer transaction failed");
+    const created = decodeEventFromReceipt(createReceipt, contractAddress, "OfferCreated");
+    onChainOfferId = created.offerId;
+  }
+
+  const value = BigInt(kWhTraded) * priceWei;
+
+  const buyerBalance = await publicClient.getBalance({ address: buyerAccount.address });
+  if (buyerBalance < value) {
+    throw new Error(`buyer wallet ${buyerAccount.address} has insufficient Sepolia ETH for the ${(Number(value) / 1e18).toFixed(6)} ETH purchase`);
+  }
+
+  // Register both participants if needed (seller = Prosumer, buyer = Consumer)
+  await ensureRole(sellerWallet, publicClient, contractAddress, sellerAccount.address, 1);
+  await ensureRole(buyerWallet, publicClient, contractAddress, buyerAccount.address, 2);
+
+  // Buyer purchases the energy; payment is held by the contract in a pending trade.
+  // DO NOT call settleTrade here — the seller must authorize settlement separately.
+  const purchaseHash = await buyerWallet.writeContract({
+    address: contractAddress,
+    abi: solarShareAbi,
+    functionName: "purchaseEnergy",
+    args: [onChainOfferId, BigInt(kWhTraded)],
+    value
+  });
+  const purchaseReceipt = await publicClient.waitForTransactionReceipt({ hash: purchaseHash });
+  if (purchaseReceipt.status !== "success") throw new Error("purchaseEnergy transaction failed");
+  const purchased = decodeEventFromReceipt(purchaseReceipt, contractAddress, "TradePurchased");
+  const tradeId = purchased.tradeId;
+
+  return {
+    onChainOfferId: Number(onChainOfferId),
+    tradeId: Number(tradeId),
+    kWhTraded,
+    totalPriceWei: value.toString(),
+    purchaseTxHash: purchaseHash,
+    purchaseGasUsed: purchaseReceipt.gasUsed.toString(),
+    purchaseGasPrice: purchaseReceipt.effectiveGasPrice?.toString() ?? null
+  };
+}
+
+// Seller-initiated settlement on-chain.
+// Only the authorized seller can call this — it uses their MetaMask wallet.
+export async function settleTradeOnChain({ tradeId, sellerAddress }) {
+  const { contractAddress, publicClient } = getClients();
+  if (!isAddress(sellerAddress) || !Number.isInteger(tradeId)) {
+    throw new Error("sellerAddress and tradeId are required");
+  }
+
+  // Read the trade from the contract to verify the seller
+  const trade = await publicClient.readContract({
+    address: contractAddress,
+    abi: solarShareAbi,
+    functionName: "trades",
+    args: [BigInt(tradeId)]
+  });
+  const onChainSeller = trade[2];
+  if (onChainSeller.toLowerCase() !== sellerAddress.toLowerCase()) {
+    throw new Error("Only the seller can settle this trade");
+  }
+  if (trade[6] === 1n) {
+    throw new Error("Trade is already settled");
+  }
+
+  // Note: This function is called from the frontend with the seller's wallet.
+  // The actual settlement transaction is signed by the seller's MetaMask.
+  // This function just verifies authorization and returns the trade details.
+  return {
+    tradeId,
+    seller: onChainSeller,
+    buyer: trade[3],
+    kWhTraded: Number(trade[4]),
+    totalPriceWei: trade[5].toString(),
+    status: trade[6] === 0n ? "Pending" : "Settled"
+  };
+}
+
 // Backend-assisted on-chain settlement (README "Option B"):
 // the configured seller key publishes the offer, the configured buyer key purchases it
 // with exact ETH payment, and the seller key settles the trade to release the funds.

@@ -11,7 +11,8 @@ const router = Router();
 
 router.get("/", async (_request, response, next) => {
   try {
-    return response.json(await Transaction.find({ txHash: { $regex: /^0x/ } }).sort({ settledAt: -1, createdAt: -1 }).limit(100));
+    // Only return transactions that have been settled (txHash exists and settledAt is set)
+    return response.json(await Transaction.find({ txHash: { $regex: /^0x/ }, settledAt: { $ne: null } }).sort({ settledAt: -1, createdAt: -1 }).limit(100));
   } catch (error) {
     return next(error);
   }

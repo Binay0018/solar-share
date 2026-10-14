@@ -28,7 +28,7 @@ export default function SettleButton({ trade, wallet, onComplete, onSettled }) {
       const receipt = await getPublicClient().waitForTransactionReceipt({ hash });
       if (receipt.status !== "success") throw new Error("Settlement transaction failed");
 
-      // Notify backend
+      // Notify backend to mark as settled
       const apiBase = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
       await fetch(`${apiBase}/transactions/confirm-settlement`, {
         method: "POST",
@@ -49,11 +49,11 @@ export default function SettleButton({ trade, wallet, onComplete, onSettled }) {
     <button
       className="text-button"
       onClick={settle}
-      disabled={loading}
+      disabled={loading || trade.status === "settled"}
       style={{ opacity: loading ? 0.7 : 1, fontWeight: "600", cursor: loading ? "not-allowed" : "pointer" }}
       title="Settle this trade on the blockchain"
     >
-      {loading ? "Settling..." : "Settle"}
+      {loading ? "Settling..." : trade.status === "settled" ? "Settled" : "Settle"}
     </button>
   );
 }

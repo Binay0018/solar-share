@@ -4,7 +4,7 @@ import MatchLog from "../models/MatchLog.js";
 import MatchingState from "../models/MatchingState.js";
 import TradeRequest from "../models/TradeRequest.js";
 import Transaction from "../models/Transaction.js";
-import { settleMatchOnChain, getContractSellerAddress } from "./contractService.js";
+import { purchaseMatchOnChain, getContractSellerAddress } from "./contractService.js";
 
 // Serializes matching runs so concurrent meter readings, offers, and trade
 // requests can never match (and save) the same pair twice.
@@ -110,42 +110,38 @@ export async function attemptMatches() {
         }
 
         try {
-          const settlement = await settleMatchOnChain({ offer: claimed, kWhTraded: onChainKWh });
+          const purchase = await purchaseMatchOnChain({ offer: claimed, kWhTraded: onChainKWh });
 
           // Update offer status
           const newOfferKWh = claimed.kWhAvailable - onChainKWh;
           await EnergyOffer.findByIdAndUpdate(offer._id, {
             kWhAvailable: newOfferKWh,
             status: newOfferKWh > 0.001 ? "open" : "settled",
-            onChainOfferId: settlement.onChainOfferId
+            onChainOfferId: purchase.onChainOfferId
           });
 
-          // Create transaction record
+          // Create transaction record — NO settlement yet, just the purchase
           const transaction = await Transaction.create({
             offerId: offer._id,
             requestId: request._id,
             kWhTraded: onChainKWh,
             totalPrice: Number((onChainKWh * offer.pricePerKWh).toFixed(2)),
-            txHash: settlement.txHash,
-            purchaseTxHash: settlement.purchaseTxHash,
-            onChainTradeId: settlement.tradeId,
-            purchaseGasUsed: settlement.purchaseGasUsed,
-            purchaseGasPrice: settlement.purchaseGasPrice,
-            settlementGasUsed: settlement.settlementGasUsed,
-            settlementGasPrice: settlement.settlementGasPrice,
-            settledAt: new Date()
+            purchaseTxHash: purchase.purchaseTxHash,
+            onChainTradeId: purchase.tradeId,
+            purchaseGasUsed: purchase.purchaseGasUsed,
+            purchaseGasPrice: purchase.purchaseGasPrice,
+            settledAt: null  // NOT settled — awaiting seller authorization
           });
 
-          // Add fill to request
+          // Add fill to request — status is "awaiting_seller", NOT "settled"
           fills.push({
             offerId: offer._id,
             sellerId: offer.sellerId,
             kWh: onChainKWh,
             pricePerKWh: offer.pricePerKWh,
-            status: "settled",
-            txHash: settlement.txHash,
-            purchaseTxHash: settlement.purchaseTxHash,
-            onChainTradeId: settlement.tradeId
+            status: "awaiting_seller",
+            purchaseTxHash: purchase.purchaseTxHash,
+            onChainTradeId: purchase.tradeId
           });
 
           remainingKWh = Number((remainingKWh - onChainKWh).toFixed(3));
@@ -154,19 +150,19 @@ export async function attemptMatches() {
             offerId: offer._id,
             requestId: request._id,
             status: "success",
-            reason: "settled on-chain (aggregation fill)",
+            reason: "purchased on-chain — awaiting seller settlement",
             kWhMatched: onChainKWh,
             totalPrice: Number((onChainKWh * offer.pricePerKWh).toFixed(2)),
-            txHash: settlement.txHash
+            txHash: purchase.purchaseTxHash
           });
 
           results.push({
-            status: "success",
+            status: "awaiting_seller",
             offerId: offer._id,
             requestId: request._id,
-            txHash: settlement.txHash,
+            txHash: purchase.purchaseTxHash,
             onChain: true,
-            tradeId: settlement.tradeId,
+            tradeId: purchase.tradeId,
             kWh: onChainKWh,
             sellerId: offer.sellerId
           });
