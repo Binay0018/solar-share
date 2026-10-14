@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useState } from "react";
+import { StrictMode, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { isAddress } from "viem";
 import "./styles.css";
@@ -9,19 +9,21 @@ import { contractAddress, contractGasLimit, decodeContractEvent, ensureProsumer,
 
 const apiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
-// Daylight generation curve across IST daylight hours (peaks ~12:30 IST)
-const chartData = [0, 0, 0, 0, 0, 1.2, 3.8, 6.5, 8.9, 10.4, 11.2, 10.8, 9.4, 7.1, 4.2, 1.8, 0.4, 0];
-
+// Reference table of state DISCOM tariffs. There is no public tariff API for
+// these boards, so the rates are maintained here as reference data in ₹/kWh.
 const INDIAN_DISCOMS = [
-  { id: "bescom", name: "BESCOM (Bengaluru / Karnataka)", stateEn: "Karnataka", stateHi: "कर्नाटक", gridRate: "₹7.50/unit", feedIn: "₹4.10/unit" },
-  { id: "tangedco", name: "TANGEDCO (Tamil Nadu)", stateEn: "Tamil Nadu", stateHi: "तमिलनाडु", gridRate: "₹6.80/unit", feedIn: "₹3.80/unit" },
-  { id: "mahadiscom", name: "MSEDCL / Mahavitaran (Maharashtra)", stateEn: "Maharashtra", stateHi: "महाराष्ट्र", gridRate: "₹8.20/unit", feedIn: "₹4.50/unit" },
-  { id: "brpl", name: "BSES Rajdhani (Delhi NCR)", stateEn: "Delhi", stateHi: "दिल्ली", gridRate: "₹6.50/unit", feedIn: "₹3.95/unit" },
-  { id: "ugvcl", name: "UGVCL / GUVNL (Gujarat)", stateEn: "Gujarat", stateHi: "गुजरात", gridRate: "₹6.20/unit", feedIn: "₹4.25/unit" },
-  { id: "tsspdcl", name: "TSSPDCL (Telangana)", stateEn: "Telangana", stateHi: "तेलंगाना", gridRate: "₹7.20/unit", feedIn: "₹4.00/unit" },
-  { id: "wbsetcl", name: "WBSEDCL (West Bengal)", stateEn: "West Bengal", stateHi: "पश्चिम बंगाल", gridRate: "₹7.40/unit", feedIn: "₹3.75/unit" },
-  { id: "uppcl", name: "UPPCL (Uttar Pradesh)", stateEn: "Uttar Pradesh", stateHi: "उत्तर प्रदेश", gridRate: "₹6.90/unit", feedIn: "₹3.60/unit" },
+  { id: "bescom", name: "BESCOM (Bengaluru / Karnataka)", stateEn: "Karnataka", stateHi: "कर्नाटक", gridRatePerKWh: 7.5, feedInPerKWh: 4.1 },
+  { id: "tangedco", name: "TANGEDCO (Tamil Nadu)", stateEn: "Tamil Nadu", stateHi: "तमिलनाडु", gridRatePerKWh: 6.8, feedInPerKWh: 3.8 },
+  { id: "mahadiscom", name: "MSEDCL / Mahavitaran (Maharashtra)", stateEn: "Maharashtra", stateHi: "महाराष्ट्र", gridRatePerKWh: 8.2, feedInPerKWh: 4.5 },
+  { id: "brpl", name: "BSES Rajdhani (Delhi NCR)", stateEn: "Delhi", stateHi: "दिल्ली", gridRatePerKWh: 6.5, feedInPerKWh: 3.95 },
+  { id: "ugvcl", name: "UGVCL / GUVNL (Gujarat)", stateEn: "Gujarat", stateHi: "गुजरात", gridRatePerKWh: 6.2, feedInPerKWh: 4.25 },
+  { id: "tsspdcl", name: "TSSPDCL (Telangana)", stateEn: "Telangana", stateHi: "तेलंगाना", gridRatePerKWh: 7.2, feedInPerKWh: 4.0 },
+  { id: "wbsetcl", name: "WBSEDCL (West Bengal)", stateEn: "West Bengal", stateHi: "पश्चिम बंगाल", gridRatePerKWh: 7.4, feedInPerKWh: 3.75 },
+  { id: "uppcl", name: "UPPCL (Uttar Pradesh)", stateEn: "Uttar Pradesh", stateHi: "उत्तर प्रदेश", gridRatePerKWh: 6.9, feedInPerKWh: 3.6 },
 ];
+
+const formatRate = (value) => `₹${Number(value).toFixed(2)}/unit`;
+const generateId = (prefix) => `${prefix}-${Math.random().toString(36).slice(2, 8)}`;
 
 // Complete English & Hindi dictionary
 const translations = {
@@ -41,10 +43,10 @@ const translations = {
     surplusLabel: "Current Solar Surplus",
     demandLabel: "Current Power Demand",
     unitSuffix: " Units (kWh)",
-    surplusSub: "↑ ₹22.05/hr estimated earnings",
-    demandSub: "↓ ₹21.00 saved vs DISCOM",
+    surplusSub: "↑ ₹{amount}/hr estimated earnings",
+    demandSub: "↓ ₹{amount} saved vs DISCOM",
     genTodayLabel: "Today's Total Generation",
-    genTodaySub: "Peak solar irradiance at 12:30 IST",
+    genTodaySub: "Peak output at {peakHour} IST",
     communityValLabel: "Local Community Value",
     communityValSub: "total savings vs DISCOM slab",
     networkActLabel: "Live Network Activity",
@@ -53,7 +55,7 @@ const translations = {
     tariffGridTitle: "DISCOM Grid Tariff",
     tariffP2pTitle: "SolarShare P2P Rate",
     tariffFeedInTitle: "DISCOM Feed-in Rate",
-    tariffBadge: "Prosumers earn +35% more • Consumers save 28% on electricity",
+    tariffBadge: "Prosumers earn +{uplift}% more • Consumers save {savings}% on electricity",
     chartHeading: "Rooftop Generation Profile",
     chartSub: "24-Hour Solar Energy Curve",
     chartChip: "IST Timezone (UTC+5:30)",
@@ -82,7 +84,7 @@ const translations = {
     sellerIdPlaceholder: "e.g. solar-home-01",
     availUnitsLabel: "Available Units (kWh)",
     ratePerUnitLabel: "Rate per Unit (₹ / kWh)",
-    recommendedRate: "Recommended: ₹4.80 - ₹5.80/unit (cheaper than DISCOM ₹",
+    recommendedRate: "Recommended: ₹{low} - ₹{high}/unit (cheaper than DISCOM ₹{grid})",
     publishOfferBtn: "Publish Solar Offer",
     buyerIdLabel: "Buyer / Household ID",
     buyerIdPlaceholder: "e.g. flat-302-koramangala",
@@ -123,10 +125,10 @@ const translations = {
     surplusLabel: "अतिरिक्त सौर ऊर्जा (Surplus)",
     demandLabel: "वर्तमान बिजली मांग (Demand)",
     unitSuffix: " यूनिट्स (kWh)",
-    surplusSub: "↑ ₹22.05 प्रति घंटा संभावित आय",
-    demandSub: "↓ ₹21.00 डिस्कॉम से सीधी बचत",
+    surplusSub: "↑ ₹{amount} प्रति घंटा संभावित आय",
+    demandSub: "↓ ₹{amount} डिस्कॉम से सीधी बचत",
     genTodayLabel: "आज का कुल सौर उत्पादन",
-    genTodaySub: "दोपहर 12:30 IST पर पीक सौर विकिरण",
+    genTodaySub: "{peakHour} IST पर पीक उत्पादन",
     communityValLabel: "स्थानीय समुदाय मूल्य",
     communityValSub: "कुल बचत (DISCOM स्लैब की तुलना में)",
     networkActLabel: "सक्रिय नेटवर्क गतिविधि",
@@ -135,7 +137,7 @@ const translations = {
     tariffGridTitle: "सरकारी ग्रिड दर",
     tariffP2pTitle: "SolarShare P2P विनिमय दर",
     tariffFeedInTitle: "DISCOM सोलर एक्सपोर्ट दर",
-    tariffBadge: "उत्पादक को +35% अधिक फायदा • उपभोक्ता को 28% सस्ती बिजली",
+    tariffBadge: "उत्पादक को +{uplift}% अधिक फायदा • उपभोक्ता को {savings}% सस्ती बिजली",
     chartHeading: "रूफटॉप जनरेशन प्रोफाइल",
     chartSub: "दिनभर की सौर ऊर्जा (24 घंटे)",
     chartChip: "IST टाइमज़ोन (UTC+5:30)",
@@ -164,7 +166,7 @@ const translations = {
     sellerIdPlaceholder: "उदा. solar-home-01",
     availUnitsLabel: "उपलब्ध यूनिट्स (kWh)",
     ratePerUnitLabel: "दर प्रति यूनिट (₹ / kWh)",
-    recommendedRate: "अनुशंसित दर: ₹4.80 - ₹5.80/यूनिट (डिस्कॉम से सस्ती ₹",
+    recommendedRate: "अनुशंसित दर: ₹{low} - ₹{high}/यूनिट (डिस्कॉम से सस्ती ₹{grid})",
     publishOfferBtn: "ऑफर प्रकाशित करें",
     buyerIdLabel: "उपभोक्ता आईडी (Buyer ID)",
     buyerIdPlaceholder: "उदा. consumer-flat-302",
@@ -228,15 +230,18 @@ function StatusPill({ status, lang }) {
   return <span className={`status status-${status}`}>{label}</span>;
 }
 
-function TrendChart() {
-  const maxVal = Math.max(...chartData);
-  const points = chartData
-    .map((value, index) => {
-      const x = (index / (chartData.length - 1)) * 340;
-      const y = 90 - (value / maxVal) * 75;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    })
-    .join(" ");
+function TrendChart({ generation, consumption }) {
+  const maxVal = Math.max(0.001, ...generation, ...consumption);
+  const toPoints = (values) =>
+    values
+      .map((value, index) => {
+        const x = (index / (values.length - 1)) * 340;
+        const y = 90 - (value / maxVal) * 75;
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      })
+      .join(" ");
+  const generationPoints = toPoints(generation);
+  const consumptionPoints = toPoints(consumption);
 
   return (
     <div className="trend-chart" aria-label="Solar rooftop generation curve across Indian daytime hours">
@@ -247,21 +252,16 @@ function TrendChart() {
             <stop offset="100%" stopColor="#f2ba49" stopOpacity="0" />
           </linearGradient>
         </defs>
-        <polygon points={`0,90 ${points} 340,90`} fill="url(#solarGradient)" />
-        <polyline points={points} fill="none" stroke="#f2ba49" strokeWidth="2.5" />
-        {chartData.map((value, index) => {
-          if (value === 0) return null;
-          const x = (index / (chartData.length - 1)) * 340;
-          const y = 90 - (value / maxVal) * 75;
-          return <circle key={index} cx={x} cy={y} r="3" fill="#f2ba49" stroke="#121815" strokeWidth="1" />;
-        })}
+        <polygon points={`0,90 ${generationPoints} 340,90`} fill="url(#solarGradient)" />
+        <polyline points={generationPoints} fill="none" stroke="#f2ba49" strokeWidth="2.5" />
+        <polyline points={consumptionPoints} fill="none" stroke="#7dd3fc" strokeWidth="2" strokeDasharray="4 3" />
       </svg>
       <div className="chart-labels">
-        <span>05:30 IST</span>
-        <span>09:00</span>
-        <span>12:30 (Peak)</span>
-        <span>15:30</span>
-        <span>18:30 IST</span>
+        <span>00 IST</span>
+        <span>06:00</span>
+        <span>12:00</span>
+        <span>18:00</span>
+        <span>23 IST</span>
       </div>
     </div>
   );
@@ -275,6 +275,8 @@ function App() {
   const [offers, setOffers] = useState([]);
   const [trades, setTrades] = useState([]);
   const [transactions, setTransactions] = useState([]);
+  const [readings, setReadings] = useState([]);
+  const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -282,27 +284,31 @@ function App() {
   const t = translations[lang];
 
   const [offerForm, setOfferForm] = useState({
-    sellerId: "solar-rooftop-blr-01",
-    kWhAvailable: "5",
-    pricePerKWh: "5.25",
+    sellerId: "",
+    kWhAvailable: "",
+    pricePerKWh: "",
   });
   const [tradeForm, setTradeForm] = useState({
-    buyerId: "household-indiranagar-04",
-    kWhNeeded: "4.0",
-    maxPricePerKWh: "5.80",
+    buyerId: "",
+    kWhNeeded: "",
+    maxPricePerKWh: "",
   });
 
   async function refresh() {
     setLoading(true);
     try {
-      const [offerData, tradeData, transactionData] = await Promise.all([
+      const [offerData, tradeData, transactionData, readingData, metricsData] = await Promise.all([
         apiRequest("/offers?status=open"),
         apiRequest("/trades"),
         apiRequest("/transactions"),
+        apiRequest("/meter-readings").catch(() => []),
+        apiRequest("/metrics").catch(() => null),
       ]);
       setOffers(offerData);
       setTrades(tradeData);
       setTransactions(transactionData);
+      setReadings(readingData);
+      setMetrics(metricsData);
       setError("");
     } catch {
       setError(t.backendError);
@@ -341,43 +347,52 @@ function App() {
     setSubmittingOffer(true);
     setNotice("");
     try {
-      if (!wallet) throw new Error("Connect the seller wallet before publishing an on-chain offer");
+      const sellerId = wallet || offerForm.sellerId.trim() || generateId("prosumer");
       const payload = {
-        sellerId: wallet,
+        sellerId,
         kWhAvailable: Number(offerForm.kWhAvailable),
         pricePerKWh: Number(offerForm.pricePerKWh),
       };
 
-      if (!Number.isInteger(payload.kWhAvailable) || payload.kWhAvailable <= 0) {
-        throw new Error(lang === "hi" ? "ऑन-चेन ऑफर के लिए पूर्ण kWh संख्या दर्ज करें, जैसे 5" : "Enter a whole kWh amount for an on-chain offer, for example 5");
+      if (!payload.kWhAvailable || payload.kWhAvailable <= 0) {
+        throw new Error(lang === "hi" ? "कृपया मान्य यूनिट्स (kWh > 0) दर्ज करें" : "Please enter valid units (kWh > 0)");
       }
       if (isNaN(payload.pricePerKWh) || payload.pricePerKWh < 0) {
         throw new Error(lang === "hi" ? "कृपया मान्य दर (₹ >= 0) दर्ज करें" : "Please enter valid rate (₹ >= 0)");
       }
 
-      setNotice("Confirm in MetaMask: create the offer on-chain...");
-      setNotice("Confirm in MetaMask: register this wallet as a prosumer if requested...");
-      await ensureProsumer(wallet);
-      setNotice("Confirm in MetaMask: create the offer on-chain...");
-      const walletClient = getWalletClient(wallet);
-      const createHash = await walletClient.writeContract({
-        address: contractAddress,
-        abi: solarShareAbi,
-        functionName: "createOffer",
-        args: [kWhToContractUnits(payload.kWhAvailable), priceToWei(payload.pricePerKWh)],
-        gas: contractGasLimit
-      });
-      setNotice("Creating offer on-chain...");
-      const receipt = await getPublicClient().waitForTransactionReceipt({ hash: createHash });
-      if (receipt.status !== "success") throw new Error("The on-chain offer transaction failed");
-      const { offerId } = decodeContractEvent(receipt, "OfferCreated");
-      setNotice("Registering offer...");
-      await apiRequest("/offers", {
-        method: "POST",
-        body: JSON.stringify({ ...payload, onChainOfferId: Number(offerId) }),
-      });
+      if (wallet) {
+        if (!Number.isInteger(payload.kWhAvailable)) {
+          throw new Error(lang === "hi" ? "ऑन-चेन ऑफर के लिए पूर्ण kWh संख्या दर्ज करें, जैसे 5" : "Enter a whole kWh amount for an on-chain offer, for example 5");
+        }
+        setNotice("Confirm in MetaMask: register this wallet as a prosumer if requested...");
+        await ensureProsumer(wallet);
+        setNotice("Confirm in MetaMask: create the offer on-chain...");
+        const walletClient = getWalletClient(wallet);
+        const createHash = await walletClient.writeContract({
+          address: contractAddress,
+          abi: solarShareAbi,
+          functionName: "createOffer",
+          args: [kWhToContractUnits(payload.kWhAvailable), priceToWei(payload.pricePerKWh)],
+          gas: contractGasLimit
+        });
+        setNotice("Creating offer on-chain...");
+        const receipt = await getPublicClient().waitForTransactionReceipt({ hash: createHash });
+        if (receipt.status !== "success") throw new Error("The on-chain offer transaction failed");
+        const { offerId } = decodeContractEvent(receipt, "OfferCreated");
+        setNotice("Registering offer...");
+        await apiRequest("/offers", {
+          method: "POST",
+          body: JSON.stringify({ ...payload, onChainOfferId: Number(offerId) }),
+        });
+      } else {
+        await apiRequest("/offers", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+      }
 
-      setNotice(`✅ Offer live: ${payload.kWhAvailable} kWh @ ${payload.pricePerKWh}/kWh`);
+      setNotice(`✅ ${t.offerSuccess}${payload.kWhAvailable} kWh @ ₹${payload.pricePerKWh}/unit`);
       await refresh();
     } catch (err) {
       console.error("Create offer error:", err);
@@ -394,7 +409,7 @@ function App() {
     setNotice("");
     try {
       const payload = {
-        buyerId: tradeForm.buyerId.trim() || "consumer-01",
+        buyerId: tradeForm.buyerId.trim() || generateId("consumer"),
         kWhNeeded: Number(tradeForm.kWhNeeded),
         maxPricePerKWh: Number(tradeForm.maxPricePerKWh),
       };
@@ -436,7 +451,46 @@ function App() {
 
   const totalUnitsTraded = transactions.reduce((sum, tx) => sum + (tx.kWhTraded || 0), 0);
   const totalRupeesValue = transactions.reduce((sum, tx) => sum + (tx.totalPrice || 0), 0);
-  const estimatedSavings = totalUnitsTraded * 2.25;
+
+  // Live P2P price range derived from the open marketplace offers
+  const p2pPrices = offers.map((offer) => Number(offer.pricePerKWh)).filter((price) => Number.isFinite(price) && price > 0);
+  const p2pMin = p2pPrices.length ? Math.min(...p2pPrices) : null;
+  const p2pMax = p2pPrices.length ? Math.max(...p2pPrices) : null;
+  const p2pRate = p2pMin === null ? null : (p2pMin + p2pMax) / 2;
+
+  const gridRate = Number(selectedDiscom.gridRatePerKWh);
+  const feedInRate = Number(selectedDiscom.feedInPerKWh);
+
+  // Compute real KPI values from actual meter readings, live offers, and backend metrics
+  const latestReading = readings.length > 0 ? readings[0] : null;
+  const currentSurplus = latestReading ? Math.max(0, latestReading.surplusKWh || 0).toFixed(2) : "0.00";
+  const currentDemand = latestReading ? Math.max(0, latestReading.consumptionKWh || 0).toFixed(2) : "0.00";
+  const totalGenToday = readings.reduce((sum, r) => sum + (r.generationKWh || 0), 0).toFixed(1);
+  const surplusEarnings = latestReading && p2pRate !== null ? (latestReading.surplusKWh || 0) * p2pRate : 0;
+  const demandSavings = latestReading && p2pRate !== null ? (latestReading.consumptionKWh || 0) * Math.max(0, gridRate - p2pRate) : 0;
+  const communitySavings = metrics?.buyerSavingsVsBaseline ?? 0;
+  const upliftPct = p2pRate !== null && feedInRate > 0 ? Math.max(0, Math.round((p2pRate / feedInRate - 1) * 100)) : 0;
+  const savingsPct = p2pRate !== null && gridRate > 0 ? Math.max(0, Math.round((1 - p2pRate / gridRate) * 100)) : 0;
+
+  // 24-hour generation/consumption profile averaged from real meter readings (IST hours)
+  const hourlyProfile = useMemo(() => {
+    const generationSum = new Array(24).fill(0);
+    const consumptionSum = new Array(24).fill(0);
+    const hourCount = new Array(24).fill(0);
+    for (const reading of readings) {
+      const timestamp = new Date(reading.timestamp).getTime();
+      if (!Number.isFinite(timestamp)) continue;
+      const istHour = new Date(timestamp + 330 * 60000).getUTCHours();
+      generationSum[istHour] += Number(reading.generationKWh) || 0;
+      consumptionSum[istHour] += Number(reading.consumptionKWh) || 0;
+      hourCount[istHour] += 1;
+    }
+    const average = (sums) => sums.map((sum, hour) => (hourCount[hour] ? Number((sum / hourCount[hour]).toFixed(3)) : 0));
+    const generation = average(generationSum);
+    const consumption = average(consumptionSum);
+    const peakHour = generation.indexOf(Math.max(...generation));
+    return { generation, consumption, sampleCount: hourCount.reduce((total, count) => total + count, 0), peakHour };
+  }, [readings]);
 
   return (
     <main className="app-shell">
@@ -552,27 +606,29 @@ function App() {
             {mode === "prosumer" ? t.surplusLabel : t.demandLabel}
           </span>
           <strong>
-            {mode === "prosumer" ? "4.20" : "2.80"}
+            {mode === "prosumer" ? currentSurplus : currentDemand}
             <small>{t.unitSuffix}</small>
           </strong>
           <span className="metric-delta">
-            {mode === "prosumer" ? t.surplusSub : t.demandSub}
+            {mode === "prosumer"
+              ? t.surplusSub.replace("{amount}", surplusEarnings.toFixed(2))
+              : t.demandSub.replace("{amount}", demandSavings.toFixed(2))}
           </span>
         </article>
 
         <article className="metric-card">
           <span className="card-label">{t.genTodayLabel}</span>
           <strong>
-            22.4<small>{t.unitSuffix}</small>
+            {totalGenToday}<small>{t.unitSuffix}</small>
           </strong>
-          <span className="metric-delta neutral">{t.genTodaySub}</span>
+          <span className="metric-delta neutral">{t.genTodaySub.replace("{peakHour}", hourlyProfile.sampleCount ? `${String(hourlyProfile.peakHour).padStart(2, "0")}:00` : "—")}</span>
         </article>
 
         <article className="metric-card">
           <span className="card-label">{t.communityValLabel}</span>
-          <strong>{formatINR(totalRupeesValue > 0 ? totalRupeesValue : 348.5)}</strong>
+          <strong>{formatINR(totalRupeesValue)}</strong>
           <span className="metric-delta">
-            +₹{estimatedSavings > 0 ? estimatedSavings.toFixed(0) : "85"} {t.communityValSub}
+            +₹{communitySavings.toFixed(0)} {t.communityValSub}
           </span>
         </article>
 
@@ -594,18 +650,18 @@ function App() {
           <span className="tariff-title">
             {t.tariffGridTitle} ({selectedDiscom.name.split(" ")[0]}):
           </span>
-          <span className="tariff-val danger">{selectedDiscom.gridRate}</span>
+          <span className="tariff-val danger">{formatRate(gridRate)}</span>
         </div>
         <div className="tariff-item">
           <span className="tariff-title">{t.tariffP2pTitle}:</span>
-          <span className="tariff-val success">₹5.20 - ₹5.60/unit</span>
+          <span className="tariff-val success">{p2pMin === null ? "—" : `₹${p2pMin.toFixed(2)} - ₹${p2pMax.toFixed(2)}/unit`}</span>
         </div>
         <div className="tariff-item">
           <span className="tariff-title">{t.tariffFeedInTitle}:</span>
-          <span className="tariff-val warning">{selectedDiscom.feedIn}</span>
+          <span className="tariff-val warning">{formatRate(feedInRate)}</span>
         </div>
         <div className="tariff-badge">
-          <span>{t.tariffBadge}</span>
+          <span>{t.tariffBadge.replace("{uplift}", upliftPct).replace("{savings}", savingsPct)}</span>
         </div>
       </section>
 
@@ -619,7 +675,15 @@ function App() {
             </div>
             <span className="range-chip">{t.chartChip}</span>
           </div>
-          <TrendChart />
+          {hourlyProfile.sampleCount === 0 ? (
+            <div className="state-block">
+              <span className="state-icon">📡</span>
+              <strong>{lang === "hi" ? "आईओटी मीटर रीडिंग की प्रतीक्षा में" : "Waiting for IoT meter readings"}</strong>
+              <span>{lang === "hi" ? "सिम्युलेटर डेटा भेजने के बाद सौर जनरेशन प्रोफाइल यहाँ दिखाई देगा" : "The solar generation profile will appear once the simulator posts meter data."}</span>
+            </div>
+          ) : (
+            <TrendChart generation={hourlyProfile.generation} consumption={hourlyProfile.consumption} />
+          )}
           <div className="chart-legend">
             <span>
               <i className="legend-generation" /> {t.chartLegendGen}
@@ -707,7 +771,6 @@ function App() {
                     <PurchaseButton
                       offer={offer}
                       wallet={wallet}
-                      requestId={pendingPurchase?.offerId === offer._id ? pendingPurchase.requestId : null}
                       onComplete={setNotice}
                       onCompletePurchase={() => {
                         setPendingPurchase(null);
@@ -765,7 +828,10 @@ function App() {
                 </label>
               </div>
               <div className="form-helper">
-                {t.recommendedRate}{selectedDiscom.gridRate.replace(/[^0-9.]/g, "")})
+                {t.recommendedRate
+                  .replace("{low}", feedInRate.toFixed(2))
+                  .replace("{high}", gridRate.toFixed(2))
+                  .replace("{grid}", gridRate.toFixed(2))}
               </div>
               <button
                 className="primary-button"
@@ -815,7 +881,7 @@ function App() {
                 </label>
               </div>
               <div className="form-helper">
-                {t.estSavingsPrefix}{(Number(tradeForm.kWhNeeded) * 2.1).toFixed(1)}
+                {t.estSavingsPrefix}{(Number(tradeForm.kWhNeeded) * Math.max(0, gridRate - (p2pRate ?? gridRate))).toFixed(1)}
               </div>
               <button
                 className="primary-button"

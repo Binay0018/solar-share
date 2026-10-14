@@ -6,7 +6,9 @@ const router = Router();
 
 router.get("/", async (request, response, next) => {
   try {
-    const filter = request.query.status ? { status: request.query.status } : {};
+    const filter = {};
+    if (request.query.status) filter.status = request.query.status;
+    if (request.query.onChain === "true") filter.onChainOfferId = { $exists: true, $ne: null };
     return response.json(await EnergyOffer.find(filter).sort({ createdAt: -1 }));
   } catch (error) {
     return next(error);
@@ -26,7 +28,10 @@ router.post("/", async (request, response, next) => {
       return response.status(400).json({ error: "onChainOfferId must be a non-negative integer" });
     }
     const offer = await EnergyOffer.create({ sellerId, onChainOfferId, kWhAvailable, pricePerKWh });
-    return response.status(201).json({ offer, matching: await attemptMatches() });
+    // Run matching in the background — on-chain settlement takes ~40s per match,
+    // and the frontend polls for updates every 10s anyway.
+    attemptMatches().catch((error) => console.error("Background matching error:", error.message));
+    return response.status(201).json({ offer });
   } catch (error) {
     return next(error);
   }
