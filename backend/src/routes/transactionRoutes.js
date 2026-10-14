@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { isHash, createPublicClient, http } from "viem";
+import { isHash, createPublicClient, http, decodeEventLog } from "viem";
 import { sepolia } from "viem/chains";
 import Transaction from "../models/Transaction.js";
 import EnergyOffer from "../models/EnergyOffer.js";
@@ -84,6 +84,15 @@ router.post("/confirm-settlement", async (request, response, next) => {
     );
     if (!settledLog) {
       return response.status(400).json({ error: "no contract event found in receipt" });
+    }
+
+    // Decode and verify the event is TradeSettled for the correct trade ID
+    const decoded = decodeEventLog({ abi: solarShareAbi, data: settledLog.data, topics: settledLog.topics });
+    if (decoded.eventName !== "TradeSettled") {
+      return response.status(400).json({ error: "transaction did not settle a trade" });
+    }
+    if (decoded.args.tradeId !== BigInt(onChainTradeId)) {
+      return response.status(400).json({ error: "settlement trade ID does not match" });
     }
 
     // Update the transaction record
