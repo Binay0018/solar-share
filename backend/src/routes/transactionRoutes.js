@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { isHash } from "viem";
 import Transaction from "../models/Transaction.js";
 import EnergyOffer from "../models/EnergyOffer.js";
 import TradeRequest from "../models/TradeRequest.js";
@@ -8,7 +9,7 @@ const router = Router();
 
 router.get("/", async (_request, response, next) => {
   try {
-    return response.json(await Transaction.find().sort({ settledAt: -1, createdAt: -1 }).limit(100));
+    return response.json(await Transaction.find({ txHash: { $regex: /^0x/ } }).sort({ settledAt: -1, createdAt: -1 }).limit(100));
   } catch (error) {
     return next(error);
   }
@@ -32,6 +33,26 @@ router.post("/confirm-purchase", async (request, response, next) => {
     await Promise.all([offer.save(), tradeRequest.save()]);
     const transaction = await Transaction.create({ offerId, requestId, kWhTraded, totalPrice, ...settlement, settledAt: new Date() });
     return response.status(201).json({ transaction });
+  } catch (error) {
+    return next(error);
+  }
+});
+
+router.post("/confirm-settlement", async (request, response, next) => {
+  try {
+    const { txHash, onChainTradeId } = request.body;
+    if (!isHash(txHash) || !Number.isInteger(onChainTradeId)) {
+      return response.status(400).json({ error: "txHash and onChainTradeId are required" });
+    }
+    const transaction = await Transaction.findOneAndUpdate(
+      { onChainTradeId, txHash: { $exists: false } },
+      { $set: { txHash, settledAt: new Date() } },
+      { new: true }
+    );
+    if (!transaction) {
+      return response.status(404).json({ error: "transaction not found or already settled" });
+    }
+    return response.json({ transaction });
   } catch (error) {
     return next(error);
   }

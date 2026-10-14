@@ -3,11 +3,12 @@ import EnergyOffer from "../models/EnergyOffer.js";
 import MatchLog from "../models/MatchLog.js";
 import TradeRequest from "../models/TradeRequest.js";
 import Transaction from "../models/Transaction.js";
-import { settleMatchOnChain } from "./contractService.js";
+import { settleMatchOnChain, getContractSellerAddress } from "./contractService.js";
 
 // Serializes matching runs so concurrent meter readings, offers, and trade
 // requests can never match (and save) the same pair twice.
 let matchingInProgress = false;
+let lastMatchingRun = null;
 
 export async function attemptMatches() {
   if (matchingInProgress) {
@@ -16,16 +17,31 @@ export async function attemptMatches() {
   matchingInProgress = true;
 
   try {
+    const now = new Date();
+    // Only process requests created after the last matching run (Bug 1 fix)
+    const requestFilter = { status: "open", kWhNeeded: { $gt: 0 } };
+    if (lastMatchingRun) {
+      requestFilter.createdAt = { $gt: lastMatchingRun };
+    }
+
     // Price-time priority: cheapest first, then earliest
     const offers = await EnergyOffer.find({ status: "open", kWhAvailable: { $gt: 0 } })
       .sort({ pricePerKWh: 1, createdAt: 1 })
       .limit(50)
       .lean();
-    const requests = await TradeRequest.find({ status: "open", kWhNeeded: { $gt: 0 } })
+    const requests = await TradeRequest.find(requestFilter)
       .sort({ createdAt: 1 })
       .limit(50)
       .lean();
     const results = [];
+
+    // Get the configured seller address for backend-assisted settlement (Bug 2 fix)
+    let backendSellerAddress = null;
+    try {
+      backendSellerAddress = getContractSellerAddress();
+    } catch {
+      // Backend keys not configured — skip backend-assisted settlement
+    }
 
     for (const request of requests) {
       // Per-request lock: skip if already being processed
@@ -46,6 +62,10 @@ export async function attemptMatches() {
         if (offer.status !== "open") continue;
         if (offer.sellerId.toLowerCase() === request.buyerId.toLowerCase()) continue;
         if (offer.pricePerKWh <= 0 || offer.pricePerKWh > request.maxPricePerKWh) continue;
+
+        // Bug 2 fix: Only use backend-assisted settlement if the seller matches SELLER_PRIVATE_KEY
+        const canSettle = backendSellerAddress && offer.sellerId.toLowerCase() === backendSellerAddress.toLowerCase();
+        if (!canSettle) continue;
 
         const kWhToTake = Math.min(offer.kWhAvailable, remainingKWh);
         if (kWhToTake < 1) continue;
@@ -196,6 +216,7 @@ export async function attemptMatches() {
       }
     }
 
+    lastMatchingRun = now;
     return { attempted: results.length, results };
   } finally {
     matchingInProgress = false;

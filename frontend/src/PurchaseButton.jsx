@@ -79,7 +79,9 @@ export default function PurchaseButton({ offer, wallet, onComplete, onCompletePu
         onCompletePurchase?.(tradeData);
         onComplete?.(`✅ Trade settled on-chain! Traded ${success.kWhMatched ?? kWhAvailable} kWh @ ₹${offer.pricePerKWh}/unit with ${offer.sellerId}.`);
       } else {
-        throw new Error("Trade could not be settled. The offer may be too small or already taken.");
+        // Seller is not the backend's SELLER_PRIVATE_KEY — they need to settle via MetaMask
+        onComplete?.("Trade request created. The seller must settle this trade via MetaMask using the Settle button.");
+        onCompletePurchase?.(tradeData);
       }
     } catch (error) {
       onComplete?.(`❌ ${error.message}`);

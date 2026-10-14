@@ -5,6 +5,7 @@ import "./styles.css";
 import NewsFeed from "./NewsFeed.jsx";
 
 import PurchaseButton from "./PurchaseButton.jsx";
+import SettleButton from "./SettleButton.jsx";
 import { contractAddress, contractGasLimit, decodeContractEvent, ensureProsumer, getPublicClient, getWalletClient, kWhToContractUnits, priceToWei, solarShareAbi } from "./contractClient.js";
 
 const apiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
@@ -777,6 +778,14 @@ function App() {
                         refresh();
                       }}
                     />
+                    {wallet && offer.sellerId.toLowerCase() === wallet.toLowerCase() && (
+                      <SettleButton
+                        trade={transactions.find(tx => tx.offerId === offer._id && !tx.settledAt)}
+                        wallet={wallet}
+                        onComplete={setNotice}
+                        onSettled={refresh}
+                      />
+                    )}
                   </div>
 
                 </div>

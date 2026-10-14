@@ -39,6 +39,14 @@ function getClients() {
   };
 }
 
+// Returns the address controlled by SELLER_PRIVATE_KEY, or null if not configured.
+// The backend can only settle trades for this address — it cannot sign for arbitrary MetaMask accounts.
+export function getContractSellerAddress() {
+  const { SELLER_PRIVATE_KEY } = process.env;
+  if (!SELLER_PRIVATE_KEY || !SELLER_PRIVATE_KEY.startsWith("0x")) return null;
+  return privateKeyToAccount(SELLER_PRIVATE_KEY).address;
+}
+
 async function readParticipant(publicClient, contractAddress, address) {
   const participant = await publicClient.readContract({
     address: contractAddress,
