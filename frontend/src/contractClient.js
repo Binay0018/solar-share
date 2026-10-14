@@ -64,9 +64,15 @@ export async function ensureConsumer(account) {
 }
 
 export function decodeContractEvent(receipt, eventName) {
-  const log = receipt.logs.find((entry) => entry.address.toLowerCase() === contractAddress.toLowerCase());
-  if (!log) throw new Error(`${eventName} event was not found in the transaction receipt`);
-  const decoded = decodeEventLog({ abi: solarShareAbi, data: log.data, topics: log.topics });
-  if (decoded.eventName !== eventName) throw new Error(`Unexpected contract event: ${decoded.eventName}`);
-  return decoded.args;
+  const logs = receipt.logs.filter((entry) => entry.address.toLowerCase() === contractAddress.toLowerCase());
+  if (logs.length === 0) throw new Error(`${eventName} event was not found in the transaction receipt`);
+  for (const log of logs) {
+    try {
+      const decoded = decodeEventLog({ abi: solarShareAbi, data: log.data, topics: log.topics });
+      if (decoded.eventName === eventName) return decoded.args;
+    } catch {
+      // Not the right event, try next log
+    }
+  }
+  throw new Error(`${eventName} event was not found in the transaction receipt`);
 }

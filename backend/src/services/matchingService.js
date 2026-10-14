@@ -1,6 +1,7 @@
 import { isAddress } from "viem";
 import EnergyOffer from "../models/EnergyOffer.js";
 import MatchLog from "../models/MatchLog.js";
+import MatchingState from "../models/MatchingState.js";
 import TradeRequest from "../models/TradeRequest.js";
 import Transaction from "../models/Transaction.js";
 import { settleMatchOnChain, getContractSellerAddress } from "./contractService.js";
@@ -8,7 +9,6 @@ import { settleMatchOnChain, getContractSellerAddress } from "./contractService.
 // Serializes matching runs so concurrent meter readings, offers, and trade
 // requests can never match (and save) the same pair twice.
 let matchingInProgress = false;
-let lastMatchingRun = null;
 
 export async function attemptMatches() {
   if (matchingInProgress) {
@@ -17,11 +17,30 @@ export async function attemptMatches() {
   matchingInProgress = true;
 
   try {
+    // Acquire persistent lock
+    const lockAcquired = await MatchingState.findOneAndUpdate(
+      { isRunning: false },
+      { $set: { isRunning: true, startedAt: new Date() } },
+      { new: true, upsert: true }
+    );
+    if (!lockAcquired) {
+      return { attempted: 0, results: [], skipped: "matching already in progress (persistent lock)" };
+    }
+
     const now = new Date();
-    // Only process requests created after the last matching run (Bug 1 fix)
+
+    // Recover requests stuck in partially_filled from a crashed run (older than 5 minutes)
+    const stuckThreshold = new Date(now.getTime() - 5 * 60 * 1000);
+    await TradeRequest.updateMany(
+      { status: "partially_filled", updatedAt: { $lt: stuckThreshold } },
+      { $set: { status: "open" } }
+    );
+
+    // Only process requests created after the last successful matching run
+    const state = await MatchingState.findOne({ _id: "singleton" }).lean();
     const requestFilter = { status: "open", kWhNeeded: { $gt: 0 } };
-    if (lastMatchingRun) {
-      requestFilter.createdAt = { $gt: lastMatchingRun };
+    if (state?.lastMatchingRun) {
+      requestFilter.createdAt = { $gt: state.lastMatchingRun };
     }
 
     // Price-time priority: cheapest first, then earliest
@@ -35,7 +54,7 @@ export async function attemptMatches() {
       .lean();
     const results = [];
 
-    // Get the configured seller address for backend-assisted settlement (Bug 2 fix)
+    // Get the configured seller address for backend-assisted settlement
     let backendSellerAddress = null;
     try {
       backendSellerAddress = getContractSellerAddress();
@@ -63,7 +82,7 @@ export async function attemptMatches() {
         if (offer.sellerId.toLowerCase() === request.buyerId.toLowerCase()) continue;
         if (offer.pricePerKWh <= 0 || offer.pricePerKWh > request.maxPricePerKWh) continue;
 
-        // Bug 2 fix: Only use backend-assisted settlement if the seller matches SELLER_PRIVATE_KEY
+        // Only use backend-assisted settlement if the seller matches SELLER_PRIVATE_KEY
         const canSettle = backendSellerAddress && offer.sellerId.toLowerCase() === backendSellerAddress.toLowerCase();
         if (!canSettle) continue;
 
@@ -216,8 +235,18 @@ export async function attemptMatches() {
       }
     }
 
-    lastMatchingRun = now;
+    // Update persistent state
+    await MatchingState.findByIdAndUpdate("singleton", {
+      $set: { lastMatchingRun: now, isRunning: false, finishedAt: new Date() }
+    }, { upsert: true });
+
     return { attempted: results.length, results };
+  } catch (error) {
+    // Release lock on error
+    await MatchingState.findByIdAndUpdate("singleton", {
+      $set: { isRunning: false, finishedAt: new Date() }
+    }, { upsert: true });
+    throw error;
   } finally {
     matchingInProgress = false;
   }

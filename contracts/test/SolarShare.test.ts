@@ -93,4 +93,112 @@ describe("SolarShare", async () => {
       solarShare.write.updateOfferPrice([0n, 11n], { account: seller.account })
     );
   });
+
+  it("supports partial purchase and tracks remaining quantity", async () => {
+    const solarShare = await deployContract();
+    const pricePerKWh = parseEther("0.02");
+
+    await solarShare.write.registerParticipant([1], { account: seller.account });
+    await solarShare.write.registerParticipant([2], { account: buyer.account });
+    await solarShare.write.createOffer([10n, pricePerKWh], { account: seller.account });
+
+    // Purchase 3 out of 10 kWh
+    const purchaseHash = await solarShare.write.purchaseEnergy([0n, 3n], {
+      account: buyer.account,
+      value: pricePerKWh * 3n
+    });
+    await publicClient.waitForTransactionReceipt({ hash: purchaseHash });
+
+    const offer = (await solarShare.read.offers([0n])) as OfferTuple;
+    assert.equal(offer[2], 7n); // 10 - 3 = 7 remaining
+    assert.equal(offer[4], 1); // Matched status
+
+    // Purchase remaining 7 kWh
+    const purchaseHash2 = await solarShare.write.purchaseEnergy([0n, 7n], {
+      account: buyer.account,
+      value: pricePerKWh * 7n
+    });
+    await publicClient.waitForTransactionReceipt({ hash: purchaseHash2 });
+
+    const offer2 = (await solarShare.read.offers([0n])) as OfferTuple;
+    assert.equal(offer2[2], 0n); // 0 remaining
+  });
+
+  it("rejects purchase exceeding available quantity", async () => {
+    const solarShare = await deployContract();
+    const pricePerKWh = parseEther("0.01");
+
+    await solarShare.write.registerParticipant([1], { account: seller.account });
+    await solarShare.write.registerParticipant([2], { account: buyer.account });
+    await solarShare.write.createOffer([5n, pricePerKWh], { account: seller.account });
+
+    await assert.rejects(
+      solarShare.write.purchaseEnergy([0n, 6n], {
+        account: buyer.account,
+        value: pricePerKWh * 6n
+      })
+    );
+  });
+
+  it("prevents non-seller from settling a trade", async () => {
+    const solarShare = await deployContract();
+    const pricePerKWh = parseEther("0.01");
+
+    await solarShare.write.registerParticipant([1], { account: seller.account });
+    await solarShare.write.registerParticipant([2], { account: buyer.account });
+    await solarShare.write.createOffer([5n, pricePerKWh], { account: seller.account });
+    await solarShare.write.purchaseEnergy([0n, 2n], {
+      account: buyer.account,
+      value: pricePerKWh * 2n
+    });
+
+    // Buyer tries to settle — should fail
+    await assert.rejects(
+      solarShare.write.settleTrade([0n], { account: buyer.account })
+    );
+  });
+
+  it("prevents double settlement", async () => {
+    const solarShare = await deployContract();
+    const pricePerKWh = parseEther("0.01");
+
+    await solarShare.write.registerParticipant([1], { account: seller.account });
+    await solarShare.write.registerParticipant([2], { account: buyer.account });
+    await solarShare.write.createOffer([5n, pricePerKWh], { account: seller.account });
+    await solarShare.write.purchaseEnergy([0n, 2n], {
+      account: buyer.account,
+      value: pricePerKWh * 2n
+    });
+
+    // First settlement succeeds
+    await solarShare.write.settleTrade([0n], { account: seller.account });
+
+    // Second settlement fails
+    await assert.rejects(
+      solarShare.write.settleTrade([0n], { account: seller.account })
+    );
+  });
+
+  it("transfers ETH to seller on settlement", async () => {
+    const solarShare = await deployContract();
+    const pricePerKWh = parseEther("0.01");
+
+    await solarShare.write.registerParticipant([1], { account: seller.account });
+    await solarShare.write.registerParticipant([2], { account: buyer.account });
+    await solarShare.write.createOffer([5n, pricePerKWh], { account: seller.account });
+
+    const sellerBalanceBefore = await publicClient.getBalance({ address: seller.account.address });
+
+    await solarShare.write.purchaseEnergy([0n, 2n], {
+      account: buyer.account,
+      value: pricePerKWh * 2n
+    });
+
+    const settleHash = await solarShare.write.settleTrade([0n], { account: seller.account });
+    const receipt = await publicClient.waitForTransactionReceipt({ hash: settleHash });
+
+    const sellerBalanceAfter = await publicClient.getBalance({ address: seller.account.address });
+    // Seller should have received 0.02 ETH (minus gas)
+    assert.ok(sellerBalanceAfter > sellerBalanceBefore, "seller balance should increase after settlement");
+  });
 });
