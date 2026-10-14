@@ -41,7 +41,7 @@ Phases are documented here for the complete project plan. The status table is in
 - Viem is used for contract interaction; `ethers.js` is not used.
 - Native ETH is the Phase 2 settlement currency. Prices are integer wei per kWh, payment is held by the contract during a pending trade, and the registered seller settles the trade.
 - The browser on-chain flow uses MetaMask for `createOffer` and `purchaseEnergy`. The backend verifies the buyer's `TradePurchased` receipt, then uses only the configured seller key for `settleTrade` (backend-assisted Option B).
-- Matching and requests remain off-chain. The backend will select compatible offers and requests, then the buyer confirms `purchaseEnergy` and the seller calls `settleTrade`.
+- Matching and requests remain off-chain. The matching engine uses price-time priority (cheapest first, then earliest). Multi-seller aggregation splits large requests into independent sub-trades, one per offer. The backend settles each sub-trade on-chain via `purchaseEnergy` and `settleTrade`.
 - The frontend and simulator communicate with the backend over REST. The integration phase will use polling unless a later decision documents WebSockets.
 - Secrets use Hardhat configuration variables or local environment files. Secrets must never be committed.
 

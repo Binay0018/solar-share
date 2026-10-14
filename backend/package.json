@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "chain:check": "node chain-check.mjs"
+    "chain:check": "node chain-check.mjs",
+    "bench:matching": "node bench-matching.mjs"
   },
   "dependencies": {
     "cors": "^2.8.5",
