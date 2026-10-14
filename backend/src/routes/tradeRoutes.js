@@ -23,7 +23,9 @@ router.post("/", async (request, response, next) => {
       return response.status(400).json({ error: "requested amount must be positive and maximum price cannot be negative" });
     }
     const tradeRequest = await TradeRequest.create({ buyerId, kWhNeeded, maxPricePerKWh });
-    return response.status(201).json({ tradeRequest, matching: await attemptMatches() });
+    // Run matching in the background — on-chain settlement takes ~40s per match
+    attemptMatches().catch((error) => console.error("Background matching error:", error.message));
+    return response.status(201).json({ tradeRequest });
   } catch (error) {
     return next(error);
   }

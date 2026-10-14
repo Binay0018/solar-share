@@ -355,16 +355,26 @@ function App() {
         pricePerKWh: Number(offerForm.pricePerKWh),
       };
 
-      if (!payload.kWhAvailable || payload.kWhAvailable <= 0) {
+      if (!Number.isFinite(payload.kWhAvailable) || payload.kWhAvailable <= 0) {
         throw new Error(lang === "hi" ? "कृपया मान्य यूनिट्स (kWh > 0) दर्ज करें" : "Please enter valid units (kWh > 0)");
       }
-      if (isNaN(payload.pricePerKWh) || payload.pricePerKWh < 0) {
+      if (!Number.isFinite(payload.pricePerKWh) || payload.pricePerKWh < 0) {
         throw new Error(lang === "hi" ? "कृपया मान्य दर (₹ >= 0) दर्ज करें" : "Please enter valid rate (₹ >= 0)");
       }
 
       if (wallet) {
         if (!Number.isInteger(payload.kWhAvailable)) {
           throw new Error(lang === "hi" ? "ऑन-चेन ऑफर के लिए पूर्ण kWh संख्या दर्ज करें, जैसे 5" : "Enter a whole kWh amount for an on-chain offer, for example 5");
+        }
+        // Verify we're on Sepolia
+        try {
+          const chainId = await window.ethereum.request({ method: "eth_chainId" });
+          if (Number(chainId) !== 11155111) {
+            throw new Error(lang === "hi" ? "कृपया Sepolia नेटवर्क पर स्विच करें" : "Please switch to Sepolia network in MetaMask");
+          }
+        } catch (e) {
+          if (e.message.includes("Sepolia")) throw e;
+          throw new Error("Unable to verify network. Is MetaMask connected?");
         }
         setNotice("Confirm in MetaMask: register this wallet as a prosumer if requested...");
         await ensureProsumer(wallet);
@@ -379,7 +389,7 @@ function App() {
         });
         setNotice("Creating offer on-chain...");
         const receipt = await getPublicClient().waitForTransactionReceipt({ hash: createHash });
-        if (receipt.status !== "success") throw new Error("The on-chain offer transaction failed");
+        if (receipt.status !== "success") throw new Error("The on-chain offer transaction was reverted");
         const { offerId } = decodeContractEvent(receipt, "OfferCreated");
         setNotice("Registering offer...");
         await apiRequest("/offers", {
@@ -419,10 +429,10 @@ function App() {
         throw new Error("The buyer ID must match the connected MetaMask wallet");
       }
 
-      if (!payload.kWhNeeded || payload.kWhNeeded <= 0) {
+      if (!Number.isFinite(payload.kWhNeeded) || payload.kWhNeeded <= 0) {
         throw new Error(lang === "hi" ? "कृपया मान्य यूनिट्स (kWh > 0) दर्ज करें" : "Please enter valid units (kWh > 0)");
       }
-      if (isNaN(payload.maxPricePerKWh) || payload.maxPricePerKWh < 0) {
+      if (!Number.isFinite(payload.maxPricePerKWh) || payload.maxPricePerKWh < 0) {
         throw new Error(lang === "hi" ? "कृपया मान्य दर (₹ >= 0) दर्ज करें" : "Please enter valid rate (₹ >= 0)");
       }
 
@@ -430,8 +440,7 @@ function App() {
         method: "POST",
         body: JSON.stringify(payload),
       });
-      const pending = response.matching?.results?.find((result) => result.status === "pending");
-      setPendingPurchase(pending ? { ...pending, buyerId: payload.buyerId } : null);
+      setPendingPurchase(null);
 
       setNotice(`✅ ${t.tradeSuccess}${payload.kWhNeeded} kWh @ max ₹${payload.maxPricePerKWh}`);
       await refresh();
