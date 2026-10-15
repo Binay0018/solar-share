@@ -72,7 +72,8 @@ export function userErrorMessage(error) {
   if (/switch.*sepolia|chain.?id|wrong network/i.test(message)) return "Switch MetaMask to Sepolia and try again.";
   if (/insufficient funds|not enough eth/i.test(message)) return "This wallet needs more Sepolia ETH for the transaction and gas.";
   if (/not registered|incompatible role/i.test(message)) return "This wallet does not have the required on-chain role.";
-  if (/buyer.*seller|wrong wallet|does not match/i.test(message)) return "The connected wallet does not match the buyer or seller for this transaction.";
+  if (/wallet does not match|wrong wallet|does not control|must match the wallet|connect the buyer|connect a seller/i.test(message)) return "The connected wallet does not match the buyer or seller for this transaction.";
+  if (/does not match|does not contain the expected|not settled for this buyer/i.test(message)) return "The blockchain record did not match this listing, so nothing was saved. Refresh the page and try again.";
   if (/payment|value|price/i.test(message)) return "The payment does not match the on-chain offer. Refresh and try again.";
   return message;
 }
