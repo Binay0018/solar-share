@@ -12,6 +12,7 @@ import {
 } from "./contractClient.js";
 import { AddressTag, PageIntro, Toast, WalletChip, userErrorMessage } from "./FlowComponents.jsx";
 import { BuyPage, HomePage, LedgerPage, MarketPage, NewsPage, SellPage } from "./Pages.jsx";
+import { TariffPage } from "./TariffPage.jsx";
 
 const apiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
 
@@ -37,6 +38,7 @@ const NAV_ITEMS = [
   ["/sell", "Sell"],
   ["/buy", "Buy"],
   ["/ledger", "Ledger"],
+  ["/tariffs", "Tariffs"],
   ["/news", "News"]
 ];
 
@@ -287,6 +289,7 @@ function App() {
           <Route path="/buy" element={<BuyPage wallet={wallet} role={participantRole} offers={offers} trades={trades} transactions={transactions} loading={loading} onRegisterRole={registerRole} onRefresh={refresh} onNotice={setToast} />} />
           <Route path="/market" element={<MarketPage wallet={wallet} offers={offers} loading={loading} />} />
           <Route path="/ledger" element={<LedgerPage wallet={wallet} transactions={transactions} loading={loading} />} />
+          <Route path="/tariffs" element={<TariffPage offers={offers} />} />
           <Route path="/news" element={<NewsPage trades={trades} />} />
           <Route path="*" element={<NotFound navigate={navigate} />} />
         </Routes>

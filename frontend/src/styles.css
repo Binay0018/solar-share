@@ -1928,3 +1928,148 @@ button {
   .flow-news-thumb { height: 168px; }
   .flow-news-read { margin-left: 0; }
 }
+
+/* ==========================================================================
+   Electricity provider directory, tariff reference and price comparison
+   ========================================================================== */
+
+/* Wide tariff tables scroll inside their own wrapper. `contain: paint` keeps
+   that internal overflow from widening the page scroll area, so the table can
+   never push the document sideways. */
+.flow-table-wrap-tariff {
+  contain: paint;
+}
+
+.flow-tariff-calc {
+  display: grid;
+  gap: var(--s-5);
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+  align-items: start;
+}
+
+.flow-tariff-inputs,
+.flow-tariff-results,
+.flow-tariff-reference {
+  display: grid;
+  gap: var(--s-4);
+  min-width: 0;
+}
+
+.flow-tariff-inputs {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.flow-tariff-inputs > * {
+  min-width: 0;
+}
+
+.flow-tariff-facts {
+  display: grid;
+  gap: var(--s-2);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin: 0;
+}
+
+.flow-tariff-facts > div {
+  display: grid;
+  gap: 3px;
+  padding: var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+
+.flow-tariff-facts dt {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.flow-tariff-facts dd {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.flow-tariff-notes {
+  margin: 0;
+  padding-left: var(--s-5);
+  color: var(--muted);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+}
+
+.flow-tariff-notes li + li {
+  margin-top: 4px;
+}
+
+.flow-tariff-unavailable {
+  display: grid;
+  gap: var(--s-2);
+  justify-items: start;
+  padding: var(--s-4);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+  color: var(--ink-2);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+}
+
+.flow-tariff-unavailable strong { color: var(--ink); }
+.flow-tariff-unavailable p { margin: 0; }
+
+.flow-status-verified {
+  border-color: var(--green-line);
+  background: var(--green-soft);
+  color: var(--green);
+  text-transform: none;
+}
+
+.flow-status-unavailable {
+  border-color: var(--border-strong);
+  background: var(--surface-3);
+  color: var(--muted);
+  text-transform: none;
+}
+
+.flow-tariff-name {
+  display: block;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* Links that sit inside a sentence must not rely on colour alone. */
+.flow-tariff-source a {
+  text-decoration: underline;
+}
+
+.flow-tariff-fullname,
+.flow-tariff-period {
+  display: block;
+  font-size: var(--text-xs);
+}
+
+.flow-tariff-period { margin-top: 4px; }
+
+.flow-legend span.tariff-grid::before { background: var(--saffron); }
+.flow-legend span.tariff-p2p::before { background: #7fa9e0; }
+
+/* The shared chart colours a bar by its position inside one group, so the
+   single-value groups used here need explicit colours to match the legend. */
+.flow-tariff-chart .flow-bars > div:nth-child(2) > span { background: #7fa9e0; }
+
+@media (max-width: 1080px) {
+  /* The header nav now carries seven entries, so it collapses to the mobile
+     menu at the same width where the two-column grids stack. */
+  .flow-nav { display: none; }
+  .flow-menu-toggle { display: inline-flex; }
+  .flow-tariff-calc { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 620px) {
+  .flow-tariff-inputs .flow-field { width: 100%; }
+}
