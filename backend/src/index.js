@@ -11,6 +11,8 @@ import transactionRoutes from "./routes/transactionRoutes.js";
 
 import activityRoutes from "./routes/activityRoutes.js";
 import metricsRoutes from "./routes/metricsRoutes.js";
+import newsRoutes from "./routes/newsRoutes.js";
+import { getNews } from "./services/newsService.js";
 
 dotenv.config();
 
@@ -52,6 +54,10 @@ app.use("/transactions", transactionRoutes);
 app.use("/activity", activityRoutes);
 app.use("/metrics", metricsRoutes);
 
+// News is aggregated from publishers and needs no database, so it is served
+// outside the database-availability gate above.
+app.use("/news", newsRoutes);
+
 app.use((error, _request, response, _next) => {
   console.error("Backend Route Error:", error);
   response.status(500).json({ error: error?.message || "Internal server error" });
@@ -62,6 +68,10 @@ export async function start() {
   const server = app.listen(port, () => {
     console.log(`SolarShare backend listening on port ${port}`);
   });
+
+  // Warm the news cache in the background so the first visitor to the News
+  // page is served from cache instead of waiting on eight publisher feeds.
+  getNews().catch((error) => console.warn("News warm-up failed:", error?.message ?? error));
 
   // Connect to MongoDB in the background (non-blocking)
   if (mongoUri) {

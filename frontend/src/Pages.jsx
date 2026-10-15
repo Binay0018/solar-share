@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatEther } from "viem";
 import {
@@ -889,10 +889,62 @@ export function LedgerPage({ wallet, transactions, loading }) {
 }
 
 /* =========================================================================
-   News and activity
+   Energy news
    ========================================================================= */
 
-export function NewsPage({ trades = [] }) {
+const NEWS_SYNC_MS = 5 * 60 * 1000;
+
+/* Every timestamp is rendered in IST, matching the rest of the application.
+   The server decides which articles count as "today" in the same timezone. */
+function formatIst(value) {
+  if (!value) return "—";
+  return `${new Date(value).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Kolkata"
+  })} IST`;
+}
+
+/* Thumbnails come from the publisher. If one fails to load the card simply
+   renders without it rather than showing a broken image. */
+function NewsThumb({ src }) {
+  const [failed, setFailed] = useState(false);
+  if (!src || failed) return null;
+  return <img className="flow-news-thumb" src={src} alt="" loading="lazy" onError={() => setFailed(true)} />;
+}
+
+function NewsCard({ article }) {
+  return (
+    <article className="flow-news-card">
+      <NewsThumb src={article.image} />
+      <div className="flow-news-body">
+        <p className="flow-news-meta">
+          {article.categoryLabel && <span className="flow-news-tag">{article.categoryLabel}</span>}
+          <span className="flow-news-source">{article.source}</span>
+        </p>
+        <h3 className="flow-news-title">
+          <a href={article.url} target="_blank" rel="noreferrer noopener">{article.title}</a>
+        </h3>
+        {article.summary && <p className="flow-news-summary">{article.summary}</p>}
+        <p className="flow-news-foot">
+          <time dateTime={article.publishedAt} title={article.publishedAt}>{formatIst(article.publishedAt)}</time>
+          <span className="flow-news-age">{relativeTime(article.publishedAt)}</span>
+          <a className="flow-news-read" href={article.url} target="_blank" rel="noreferrer noopener">
+            Read article<span aria-hidden="true"> ↗</span>
+          </a>
+        </p>
+      </div>
+    </article>
+  );
+}
+
+/* Existing SolarShare functionality, unchanged: the live marketplace feed is
+   kept as its own panel below the news so the page still shows platform
+   activity, but it is never presented as news. */
+function MarketplaceActivity({ trades }) {
   const [activity, setActivity] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -913,47 +965,181 @@ export function NewsPage({ trades = [] }) {
   }, []);
 
   return (
-    <div className="flow-page">
-      <PageIntro eyebrow="COMMUNITY UPDATES" title="News and activity" detail="Recent marketplace activity and project announcements. Refreshes every 10 seconds." />
-      <div className="flow-grid-two">
-        <Panel eyebrow="LIVE FEED" title="Recent activity">
-          {loading ? <Skeleton rows={4} /> : error ? (
-            <div className="flow-inline-error" role="alert">{error} <button type="button" onClick={refresh}>Retry</button></div>
-          ) : activity.length || trades.some((trade) => trade.fills?.length) ? (
-            <div>
-              {[
-                ...activity,
-                ...trades.flatMap((trade) => (trade.fills ?? []).filter((fill) => fill.status !== "pending").map((fill) => ({
-                  type: "match",
-                  at: fill.updatedAt ?? trade.updatedAt,
-                  item: { ...fill, buyerId: trade.buyerId, kWhNeeded: trade.kWhNeeded, _id: fill._id ?? fill.onChainTradeId }
-                })))
-              ].sort((a, b) => new Date(b.at) - new Date(a.at)).map((entry, index) => {
-                const item = entry.item;
-                const text = entry.type === "offer"
-                  ? <><AddressTag address={item.sellerId} /> listed {item.kWhAvailable} kWh · {rupees(item.pricePerKWh)}/kWh</>
-                  : entry.type === "settlement"
-                    ? <><AddressTag address={item.sellerId} /> sold {item.kWhTraded} kWh to <AddressTag address={item.buyerId} /> for {rupees(item.totalPrice)}</>
-                    : entry.type === "match"
-                      ? <><AddressTag address={item.sellerId} /> matched {item.kWh} kWh for <AddressTag address={item.buyerId} /></>
-                      : <><AddressTag address={item.buyerId} /> requested {item.kWhNeeded} kWh</>;
-                return (
-                  <article className="flow-activity" key={`${entry.type}-${item._id}-${index}`}>
-                    <div>
-                      <StatusBadge status={entry.type === "match" ? item.status : entry.type} />
-                      <p>{text}</p>
-                      {entry.type === "settlement" && <TxLink hash={item.txHash} label="Settlement" />}
-                      {entry.type === "match" && <TxLink hash={item.purchaseTxHash} label="Purchase" />}
-                    </div>
-                    <time dateTime={entry.at}>{relativeTime(entry.at)}</time>
-                  </article>
-                );
-              })}
-            </div>
-          ) : <EmptyState icon="◷" title="No recent activity" detail="Offers, requests, and confirmed settlements will appear here." />}
-        </Panel>
+    <Panel eyebrow="LIVE FEED" title="Marketplace activity">
+      {loading ? <Skeleton rows={4} /> : error ? (
+        <div className="flow-inline-error" role="alert">{error} <button type="button" onClick={refresh}>Retry</button></div>
+      ) : activity.length || trades.some((trade) => trade.fills?.length) ? (
+        <div>
+          {[
+            ...activity,
+            ...trades.flatMap((trade) => (trade.fills ?? []).filter((fill) => fill.status !== "pending").map((fill) => ({
+              type: "match",
+              at: fill.updatedAt ?? trade.updatedAt,
+              item: { ...fill, buyerId: trade.buyerId, kWhNeeded: trade.kWhNeeded, _id: fill._id ?? fill.onChainTradeId }
+            })))
+          ].sort((a, b) => new Date(b.at) - new Date(a.at)).map((entry, index) => {
+            const item = entry.item;
+            const text = entry.type === "offer"
+              ? <><AddressTag address={item.sellerId} /> listed {item.kWhAvailable} kWh · {rupees(item.pricePerKWh)}/kWh</>
+              : entry.type === "settlement"
+                ? <><AddressTag address={item.sellerId} /> sold {item.kWhTraded} kWh to <AddressTag address={item.buyerId} /> for {rupees(item.totalPrice)}</>
+                : entry.type === "match"
+                  ? <><AddressTag address={item.sellerId} /> matched {item.kWh} kWh for <AddressTag address={item.buyerId} /></>
+                  : <><AddressTag address={item.buyerId} /> requested {item.kWhNeeded} kWh</>;
+            return (
+              <article className="flow-activity" key={`${entry.type}-${item._id}-${index}`}>
+                <div>
+                  <StatusBadge status={entry.type === "match" ? item.status : entry.type} />
+                  <p>{text}</p>
+                  {entry.type === "settlement" && <TxLink hash={item.txHash} label="Settlement" />}
+                  {entry.type === "match" && <TxLink hash={item.purchaseTxHash} label="Purchase" />}
+                </div>
+                <time dateTime={entry.at}>{relativeTime(entry.at)}</time>
+              </article>
+            );
+          })}
+        </div>
+      ) : <EmptyState icon="◷" title="No recent activity" detail="Offers, requests, and confirmed settlements will appear here." />}
+    </Panel>
+  );
+}
 
-        <Panel eyebrow="PROJECT ANNOUNCEMENTS" title="SolarShare bulletin">
+export function NewsPage({ trades = [] }) {
+  const [feed, setFeed] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
+  const [category, setCategory] = useState("all");
+
+  const load = useCallback(async (force = false) => {
+    if (force) setRefreshing(true);
+    try {
+      setFeed(await apiRequest(`/news${force ? "?refresh=1" : ""}`));
+      setError("");
+    } catch (cause) {
+      setError(cause.message || "The news feed could not be loaded.");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load(false);
+    const timer = setInterval(() => load(false), NEWS_SYNC_MS);
+    return () => clearInterval(timer);
+  }, [load]);
+
+  const articles = feed?.articles ?? [];
+  const groups = feed?.categories ?? [];
+  const options = useMemo(
+    () => [["all", `All (${articles.length})`], ...groups.map((group) => [group.id, `${group.label} (${group.count})`])],
+    [articles.length, groups]
+  );
+  const visible = category === "all" ? articles : articles.filter((article) => article.category === category);
+  const today = visible.filter((article) => article.bucket === "today");
+  const earlier = visible.filter((article) => article.bucket === "recent");
+  const sources = feed?.sources ?? [];
+  const okSources = sources.filter((source) => source.ok);
+  const failedSources = sources.filter((source) => !source.ok);
+  const updatedAt = feed?.fetchedAt ? formatIst(feed.fetchedAt) : null;
+  const activeLabel = groups.find((group) => group.id === category)?.label ?? "this category";
+  const showError = Boolean(error) && articles.length === 0;
+
+  return (
+    <div className="flow-page">
+      <PageIntro
+        eyebrow="ENERGY NEWS"
+        title="Latest energy news"
+        detail="Solar, renewables, electricity markets, storage, grids and peer-to-peer trading, gathered from specialist energy publishers. Publication times are shown in IST and today's stories are listed first."
+      />
+
+      <section className="flow-news-toolbar" aria-label="News feed controls">
+        <div className="flow-news-status">
+          {feed?.stale ? (
+            <span className="flow-news-flag" data-tone="warn" role="status">
+              Live refresh failed. Showing the last successful update{updatedAt ? ` from ${updatedAt}` : ""}.
+            </span>
+          ) : updatedAt ? (
+            <span className="flow-news-flag" role="status">Updated at {updatedAt}</span>
+          ) : null}
+          {failedSources.length > 0 && (
+            <span className="flow-news-flag" data-tone="warn">
+              {failedSources.length} of {sources.length} sources unavailable
+            </span>
+          )}
+        </div>
+        <button className="flow-secondary" type="button" onClick={() => load(true)} disabled={refreshing}>
+          {refreshing ? "Refreshing…" : "Refresh"}
+        </button>
+      </section>
+
+      {articles.length > 0 && (
+        <FilterGroup value={category} options={options} onChange={setCategory} label="Filter news by category" />
+      )}
+
+      {loading ? <Skeleton rows={6} /> : showError ? (
+        <Panel eyebrow="FEED UNAVAILABLE" title="Could not load energy news">
+          <div className="flow-inline-error" role="alert">
+            {error} <button type="button" onClick={() => load(true)}>Retry</button>
+          </div>
+        </Panel>
+      ) : articles.length === 0 ? (
+        <Panel>
+          <EmptyState
+            icon="⚡"
+            title="No new energy-related news available right now"
+            detail="Please check again later."
+            action={<button className="flow-secondary" type="button" onClick={() => load(true)}>Check again</button>}
+          />
+        </Panel>
+      ) : (
+        <>
+          {feed.expanded && (
+            <p className="flow-news-callout">
+              Only {feed.counts.today} energy {feed.counts.today === 1 ? "story has" : "stories have"} been published today, so relevant
+              headlines from the previous 48 hours are included below with their original publication times.
+            </p>
+          )}
+
+          {today.length > 0 && (
+            <section className="flow-news-group" aria-labelledby="news-group-today">
+              <h2 id="news-group-today">Today <span>{today.length}</span></h2>
+              <div className="flow-news-grid">{today.map((article) => <NewsCard article={article} key={article.id} />)}</div>
+            </section>
+          )}
+
+          {earlier.length > 0 && (
+            <section className="flow-news-group" aria-labelledby="news-group-earlier">
+              <h2 id="news-group-earlier">Earlier · previous 48 hours <span>{earlier.length}</span></h2>
+              <div className="flow-news-grid">{earlier.map((article) => <NewsCard article={article} key={article.id} />)}</div>
+            </section>
+          )}
+
+          {visible.length === 0 && (
+            <Panel>
+              <EmptyState
+                icon="◷"
+                title={`No headlines in ${activeLabel} right now`}
+                detail="Choose another category, or refresh to pull the latest headlines."
+                action={<button className="flow-secondary" type="button" onClick={() => setCategory("all")}>Show all news</button>}
+              />
+            </Panel>
+          )}
+
+          {sources.length > 0 && (
+            <p className="flow-news-sources">
+              {okSources.length > 0 && <>Sources: {okSources.map((source) => source.name).join(", ")}</>}
+              {okSources.length > 0 && failedSources.length > 0 && " · "}
+              {failedSources.length > 0 && <>unavailable: {failedSources.map((source) => source.name).join(", ")}</>}
+            </p>
+          )}
+        </>
+      )}
+
+      <div className="flow-grid-two">
+        <MarketplaceActivity trades={trades} />
+        <Panel eyebrow="HOW THE PLATFORM WORKS" title="SolarShare bulletin">
           <div className="flow-list">
             {announcements.map((item) => (
               <article className="flow-announcement" key={item.title}>
