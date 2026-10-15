@@ -4,7 +4,7 @@ import MatchLog from "../models/MatchLog.js";
 import MatchingState from "../models/MatchingState.js";
 import TradeRequest from "../models/TradeRequest.js";
 import Transaction from "../models/Transaction.js";
-import { purchaseMatchOnChain, getContractSellerAddress } from "./contractService.js";
+import { purchaseMatchOnChain } from "./contractService.js";
 
 // Serializes matching runs so concurrent meter readings, offers, and trade
 // requests can never match (and save) the same pair twice.
@@ -54,14 +54,6 @@ export async function attemptMatches() {
       .lean();
     const results = [];
 
-    // Get the configured seller address for backend-assisted settlement
-    let backendSellerAddress = null;
-    try {
-      backendSellerAddress = getContractSellerAddress();
-    } catch {
-      // Backend keys not configured — skip backend-assisted settlement
-    }
-
     for (const request of requests) {
       // Per-request lock: skip if already being processed
       const locked = await TradeRequest.findOneAndUpdate(
@@ -81,10 +73,6 @@ export async function attemptMatches() {
         if (offer.status !== "open") continue;
         if (offer.sellerId.toLowerCase() === request.buyerId.toLowerCase()) continue;
         if (offer.pricePerKWh <= 0 || offer.pricePerKWh > request.maxPricePerKWh) continue;
-
-        // Only use backend-assisted settlement if the seller matches SELLER_PRIVATE_KEY
-        const canSettle = backendSellerAddress && offer.sellerId.toLowerCase() === backendSellerAddress.toLowerCase();
-        if (!canSettle) continue;
 
         const kWhToTake = Math.min(offer.kWhAvailable, remainingKWh);
         if (kWhToTake < 1) continue;

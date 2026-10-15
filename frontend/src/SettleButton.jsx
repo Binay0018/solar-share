@@ -45,6 +45,8 @@ export default function SettleButton({ trade, wallet, onComplete, onSettled }) {
     }
   }
 
+  if (!trade) return null;
+
   return (
     <button
       className="text-button"
