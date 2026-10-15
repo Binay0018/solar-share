@@ -220,7 +220,7 @@ export async function settleTradeOnChain({ tradeId, sellerAddress }) {
     args: [BigInt(tradeId)]
   });
   if (trade[2].toLowerCase() !== sellerAddress.toLowerCase()) throw new Error("Only the seller can settle this trade");
-  if (trade[6] === 1n) throw new Error("Trade is already settled");
+  if (Number(trade[6]) === 1) throw new Error("Trade is already settled");
   return {
     tradeId,
     seller: trade[2],
@@ -290,7 +290,7 @@ export async function verifyWalletPurchase({ offer, buyerId, purchaseTxHash }) {
     chainTrade[3].toLowerCase() !== buyerId.toLowerCase() ||
     chainTrade[4] !== purchased.kWhTraded ||
     chainTrade[5] !== purchased.totalPrice ||
-    chainTrade[6] !== 0n ||
+    Number(chainTrade[6]) !== 0 ||
     transaction.value !== expectedValue ||
     purchased.totalPrice !== expectedValue
   ) {
@@ -351,7 +351,7 @@ export async function verifyWalletSettlement({ transaction, txHash }) {
   if (
     trade[2].toLowerCase() !== transaction.sellerId.toLowerCase() ||
     (transaction.buyerId && trade[3].toLowerCase() !== transaction.buyerId.toLowerCase()) ||
-    trade[6] !== 1n
+    Number(trade[6]) !== 1
   ) {
     throw new Error("on-chain trade is not settled for this buyer and seller");
   }
@@ -378,7 +378,7 @@ export async function getOnChainTradeDetails(tradeId) {
     buyerId: trade[3],
     kWhTraded,
     totalPriceWei: trade[5].toString(),
-    status: trade[6] === 1n ? "settled" : "pending"
+    status: Number(trade[6]) === 1 ? "settled" : "pending"
   };
 }
 
