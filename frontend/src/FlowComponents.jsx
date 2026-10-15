@@ -1,7 +1,18 @@
-export function StatCard({ label, value, detail }) {
+import { useId } from "react";
+
+/* ---------------------------------------------------------------------------
+   Shared presentation components.
+   These are visual only: they render whatever the caller passes in and never
+   fetch, mutate, or infer business state on their own.
+   ------------------------------------------------------------------------- */
+
+export function StatCard({ label, value, detail, tone, icon }) {
   return (
-    <article className="flow-stat-card">
-      <span>{label}</span>
+    <article className="flow-stat-card" data-tone={tone}>
+      <div className="flow-stat-head">
+        {icon && <span className="flow-stat-icon" aria-hidden="true">{icon}</span>}
+        <span>{label}</span>
+      </div>
       <strong>{value}</strong>
       {detail && <small>{detail}</small>}
     </article>
@@ -14,12 +25,12 @@ export function StatusBadge({ status }) {
   return <span className={`flow-status flow-status-${normalizedStatus}`}>{label}</span>;
 }
 
-export function StepProgress({ step, steps }) {
+export function StepProgress({ step, steps, label = "Publishing progress" }) {
   return (
-    <ol className="flow-steps" aria-label="Offer publishing progress">
-      {steps.map((label, index) => (
-        <li className={index < step ? "complete" : index === step ? "active" : ""} key={label}>
-          <span>{index < step ? "✓" : index + 1}</span>{label}
+    <ol className="flow-steps" aria-label={label}>
+      {steps.map((text, index) => (
+        <li className={index < step ? "complete" : index === step ? "active" : ""} key={text}>
+          <span aria-hidden="true">{index < step ? "✓" : index + 1}</span>{text}
         </li>
       ))}
     </ol>
@@ -47,10 +58,12 @@ export function AddressTag({ address }) {
 
 export function WalletChip({ role, address, chainName, balance, onConnect }) {
   return (
-    <button className="flow-wallet-chip" onClick={onConnect} type="button">
-      <span className="flow-wallet-dot" />
-      <span>{role}: {address ? <AddressTag address={address} /> : "Connect wallet"}</span>
-      {address && <small>{chainName} · {balance ?? "—"} ETH</small>}
+    <button className="flow-wallet-chip" data-connected={address ? "true" : "false"} onClick={onConnect} type="button">
+      <span className="flow-wallet-dot" aria-hidden="true" />
+      <span>
+        {address ? <>{role} · <AddressTag address={address} /></> : "Connect wallet"}
+        {address && <small>{chainName} · {balance ?? "—"} ETH</small>}
+      </span>
     </button>
   );
 }
@@ -78,12 +91,12 @@ export function userErrorMessage(error) {
   return message;
 }
 
-export function EmptyState({ title, detail, action }) {
+export function EmptyState({ title, detail, action, icon = "☼" }) {
   return (
     <div className="flow-empty">
-      <span aria-hidden="true">☼</span>
+      <span aria-hidden="true">{icon}</span>
       <strong>{title}</strong>
-      <p>{detail}</p>
+      {detail && <p>{detail}</p>}
       {action}
     </div>
   );
@@ -91,8 +104,98 @@ export function EmptyState({ title, detail, action }) {
 
 export function Skeleton({ rows = 3 }) {
   return (
-    <div className="flow-skeletons" aria-label="Loading">
+    <div className="flow-skeletons" aria-label="Loading" role="status">
       {Array.from({ length: rows }, (_, index) => <i key={index} />)}
+    </div>
+  );
+}
+
+export function Panel({ eyebrow, title, actions, children }) {
+  const hasHeading = Boolean(eyebrow || title || actions);
+  return (
+    <section className="flow-panel">
+      {hasHeading && (
+        <div className="flow-panel-heading">
+          <div>
+            {eyebrow && <span className="flow-eyebrow">{eyebrow}</span>}
+            {title && <h2>{title}</h2>}
+          </div>
+          {actions && <div className="flow-panel-actions">{actions}</div>}
+        </div>
+      )}
+      {children}
+    </section>
+  );
+}
+
+export function PageIntro({ eyebrow, title, detail }) {
+  return (
+    <section className="flow-page-intro">
+      <span className="flow-eyebrow">{eyebrow}</span>
+      <h1>{title}</h1>
+      {detail && <p>{detail}</p>}
+    </section>
+  );
+}
+
+export function SearchInput({ value, onChange, placeholder = "Search", label = "Search" }) {
+  const id = useId();
+  return (
+    <div className="flow-search">
+      <label className="flow-visually-hidden" htmlFor={id}>{label}</label>
+      <input id={id} type="search" value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />
+    </div>
+  );
+}
+
+export function FilterGroup({ value, options, onChange, label }) {
+  return (
+    <div className="flow-filter" role="group" aria-label={label}>
+      {options.map(([optionValue, optionLabel]) => (
+        <button
+          key={optionValue}
+          type="button"
+          className={optionValue === value ? "active" : ""}
+          aria-pressed={optionValue === value}
+          onClick={() => onChange(optionValue)}
+        >
+          {optionLabel}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function SelectField({ label, value, onChange, options }) {
+  const id = useId();
+  return (
+    <div className="flow-inline-field">
+      <label htmlFor={id}><span>{label}</span></label>
+      <select id={id} value={value} onChange={(event) => onChange(event.target.value)}>
+        {options.map(([optionValue, optionLabel]) => <option key={optionValue} value={optionValue}>{optionLabel}</option>)}
+      </select>
+    </div>
+  );
+}
+
+/* Grouped bar chart. `groups` is [{ label, values: number[] }]; the caller
+   decides what each series means, so the chart never invents data. */
+export function BarChart({ groups, ariaLabel }) {
+  const max = Math.max(1, ...groups.flatMap((group) => group.values));
+  return (
+    <div>
+      <div className="flow-bars" role="img" aria-label={ariaLabel}>
+        {groups.map((group) => (
+          <div key={group.label} title={`${group.label}: ${group.values.join(" / ")}`}>
+            {group.values.map((value, index) => (
+              <span key={index} style={{ height: `${Math.max(3, (value / max) * 100)}%` }} />
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="flow-bars-axis" aria-hidden="true">
+        {groups.map((group) => <span key={group.label}>{group.label}</span>)}
+      </div>
     </div>
   );
 }
