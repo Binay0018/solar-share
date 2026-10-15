@@ -3,16 +3,14 @@ import { Link } from "react-router-dom";
 import { formatEther } from "viem";
 import {
   contractAddress,
-  contractGasLimit,
   decodeContractEvent,
-  ensureConsumer,
   ensureProsumer,
   ensureSepoliaNetwork,
   getPublicClient,
-  getWalletClient,
   kWhToContractUnits,
   priceToWei,
-  solarShareAbi
+  solarShareAbi,
+  writeContractWithGas
 } from "./contractClient.js";
 import PurchaseButton from "./PurchaseButton.jsx";
 import SettleButton from "./SettleButton.jsx";
@@ -133,12 +131,11 @@ export function SellPage({ wallet, role, offers, readings, transactions, loading
       const priceWei = priceToWei(price);
       await ensureProsumer(wallet);
       onNotice("Confirm the offer transaction in the seller's MetaMask wallet.");
-      const hash = await getWalletClient(wallet).writeContract({
+      const hash = await writeContractWithGas(wallet, {
         address: contractAddress,
         abi: solarShareAbi,
         functionName: "createOffer",
-        args: [kWhToContractUnits(kWh), priceWei],
-        gas: contractGasLimit
+        args: [kWhToContractUnits(kWh), priceWei]
       });
       setStep(1);
       onNotice("Offer submitted by MetaMask. Waiting for its Sepolia receipt.");
@@ -252,7 +249,7 @@ export function BuyPage({ wallet, role, offers, trades, transactions, loading, o
       if (!Number.isSafeInteger(kWhNeeded) || kWhNeeded < 1) throw new Error("Enter a positive whole-kWh request.");
       if (!Number.isFinite(maxPricePerKWh) || maxPricePerKWh <= 0) throw new Error("Enter a positive maximum rate.");
       await apiRequest("/trades", { method: "POST", body: JSON.stringify({ buyerId: wallet, kWhNeeded, maxPricePerKWh }) });
-      onNotice("Request accepted. The backend signs purchaseEnergy with BUYER_PRIVATE_KEY; each registered seller signs settlement.");
+      onNotice("Request accepted. The backend is buying the matched listings on-chain with BUYER_PRIVATE_KEY. Each seller settles their own trade, so nothing appears in the ledger until a seller settles.");
       setForm({ kWh: "", maxPrice: "" });
       await onRefresh();
     } catch (cause) {
@@ -284,7 +281,7 @@ export function BuyPage({ wallet, role, offers, trades, transactions, loading, o
       <div className="flow-grid-two">
         <section className="flow-panel">
           <PanelTitle eyebrow="MATCHED REQUEST" title="Request energy" />
-          <p className="flow-copy">The fill preview uses current MongoDB offers and is indicative. The backend matcher signs purchases with its configured buyer key and can fill only offers owned by its configured seller key; the request address must match the buyer key. Use direct MetaMask purchase for other sellers.</p>
+          <p className="flow-copy">The fill preview uses the current marketplace listings and is indicative. When you submit, the backend matcher buys the cheapest eligible listings on-chain with the platform buyer wallet (BUYER_PRIVATE_KEY), so the connected wallet must be that buyer wallet. Each seller then settles their own purchase from their own wallet; nothing reaches the ledger before that.</p>
           <form className="flow-form" onSubmit={submitRequest}>
             <label>Energy needed (whole kWh)<input type="number" min="1" step="1" value={form.kWh} onChange={(event) => setForm({ ...form, kWh: event.target.value })} required /></label>
             <label>Maximum rate (₹ / kWh)<input type="number" min="0.01" step="0.01" value={form.maxPrice} onChange={(event) => setForm({ ...form, maxPrice: event.target.value })} required /></label>

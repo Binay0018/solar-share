@@ -73,14 +73,22 @@ export async function attemptMatches() {
         if (offer.pricePerKWh <= 0 || offer.pricePerKWh > request.maxPricePerKWh) continue;
         if (
           !configuredBuyer ||
-          !configuredSeller ||
           !isAddress(request.buyerId) ||
-          request.buyerId.toLowerCase() !== configuredBuyer.toLowerCase() ||
-          !isAddress(offer.sellerId) ||
-          offer.sellerId.toLowerCase() !== configuredSeller.toLowerCase()
+          request.buyerId.toLowerCase() !== configuredBuyer.toLowerCase()
         ) {
           continue;
         }
+
+        // The backend signs purchases from its own buyer wallet, so it can buy
+        // any listing that already exists on-chain. A listing that only exists
+        // in MongoDB must first be created on-chain, which needs the configured
+        // seller key, so those are only eligible when the seller key owns them.
+        const offerIsOnChain = Number.isInteger(offer.onChainOfferId);
+        const sellerIsConfigured =
+          isAddress(offer.sellerId) &&
+          Boolean(configuredSeller) &&
+          offer.sellerId.toLowerCase() === configuredSeller.toLowerCase();
+        if (!offerIsOnChain && !sellerIsConfigured) continue;
 
         const kWhToTake = Math.floor(Math.min(offer.kWhAvailable, remainingKWh));
         if (kWhToTake < 1) continue;

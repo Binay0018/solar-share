@@ -105,8 +105,17 @@ export async function purchaseMatchOnChain({ offer, buyerId, kWhTraded }) {
   if (buyerAccount.address.toLowerCase() === sellerAccount.address.toLowerCase()) {
     throw new Error("buyer and seller configuration wallets must be different");
   }
-  if (!isAddress(offer.sellerId) || offer.sellerId.toLowerCase() !== sellerAccount.address.toLowerCase()) {
-    throw new Error("SELLER_PRIVATE_KEY must control the seller address on the matched offer");
+  if (!isAddress(offer.sellerId)) {
+    throw new Error("the matched offer must have a valid seller wallet address");
+  }
+  // When the offer is already on-chain the backend only needs the buyer key to
+  // purchase it, so the seller can be any wallet (for example a MetaMask user).
+  // Only offers that still need to be created on-chain require the seller key.
+  if (
+    !Number.isInteger(offer.onChainOfferId) &&
+    offer.sellerId.toLowerCase() !== sellerAccount.address.toLowerCase()
+  ) {
+    throw new Error("only an offer owned by SELLER_PRIVATE_KEY can be published on-chain by the backend");
   }
   if (!isAddress(buyerId) || buyerId.toLowerCase() !== buyerAccount.address.toLowerCase()) {
     throw new Error("BUYER_PRIVATE_KEY must control the buyer address on the trade request");

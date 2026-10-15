@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { contractAddress, contractGasLimit, ensureSepoliaNetwork, getPublicClient, getWalletClient, solarShareAbi } from "./contractClient.js";
+import { contractAddress, ensureSepoliaNetwork, getPublicClient, solarShareAbi, writeContractWithGas } from "./contractClient.js";
 import { userErrorMessage } from "./FlowComponents.jsx";
 
 export default function SettleButton({ trade, wallet, onComplete, onSettled }) {
@@ -19,12 +19,11 @@ export default function SettleButton({ trade, wallet, onComplete, onSettled }) {
     try {
       await ensureSepoliaNetwork();
       onComplete?.("Confirm in MetaMask: settle the trade...");
-      const hash = await getWalletClient(wallet).writeContract({
+      const hash = await writeContractWithGas(wallet, {
         address: contractAddress,
         abi: solarShareAbi,
         functionName: "settleTrade",
-        args: [BigInt(trade.onChainTradeId)],
-        gas: contractGasLimit
+        args: [BigInt(trade.onChainTradeId)]
       });
       onComplete?.("Settlement transaction submitted. Waiting for confirmation...");
       const receipt = await getPublicClient().waitForTransactionReceipt({ hash });

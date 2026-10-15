@@ -2,7 +2,6 @@ import { createPublicClient, createWalletClient, custom, decodeEventLog, http, p
 import { sepolia } from "viem/chains";
 
 export const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
-export const contractGasLimit = 300000n;
 export const solarShareAbi = parseAbi([
   "function participants(address) view returns (uint8 role, bool registered)",
   "function registerParticipant(uint8 role)",
@@ -42,6 +41,29 @@ export function getPublicClient() {
   return createPublicClient({ chain: sepolia, transport });
 }
 
+// The deployed SolarShare contract is large and is not compiled with the Solidity
+// optimizer, so calls such as purchaseEnergy consume far more gas than a
+// hand-written estimate suggests (about 830,000 gas instead of 300,000).
+// Hard-coding a limit makes MetaMask reject the transaction as "likely to fail",
+// so every write estimates gas on the live node, keeps a safety margin, and
+// checks the wallet can actually pay for value plus gas before prompting.
+export async function writeContractWithGas(account, request) {
+  const publicClient = getPublicClient();
+  const estimate = await publicClient.estimateContractGas({ ...request, account });
+  const gas = (estimate * 125n) / 100n;
+  const value = request.value ?? 0n;
+  const balance = await publicClient.getBalance({ address: account });
+  const fees = await publicClient.estimateFeesPerGas().catch(() => null);
+  const maxFeePerGas = fees?.maxFeePerGas ?? (await publicClient.getGasPrice());
+  const required = value + gas * maxFeePerGas;
+  if (balance < required) {
+    throw new Error(
+      `This wallet (${account}) holds ${Number(balance) / 1e18} ETH but this transaction needs about ${Number(required) / 1e18} ETH including gas. Add Sepolia ETH to this wallet and try again.`
+    );
+  }
+  return getWalletClient(account).writeContract({ ...request, gas });
+}
+
 export async function ensureSepoliaNetwork() {
   if (!window.ethereum) throw new Error("MetaMask was not found");
   const chainId = await window.ethereum.request({ method: "eth_chainId" });
@@ -53,7 +75,7 @@ export async function ensureProsumer(account) {
   const participant = await publicClient.readContract({ address: contractAddress, abi: solarShareAbi, functionName: "participants", args: [account] });
   const role = Number(participant[0]);
   if (participant[1] && (role === 1 || role === 3)) return;
-  const hash = await getWalletClient(account).writeContract({ address: contractAddress, abi: solarShareAbi, functionName: "registerParticipant", args: [1], gas: contractGasLimit });
+  const hash = await writeContractWithGas(account, { address: contractAddress, abi: solarShareAbi, functionName: "registerParticipant", args: [1] });
   const receipt = await publicClient.waitForTransactionReceipt({ hash });
   if (receipt.status !== "success") throw new Error("Seller registration failed");
 }
@@ -63,7 +85,7 @@ export async function ensureConsumer(account) {
   const participant = await publicClient.readContract({ address: contractAddress, abi: solarShareAbi, functionName: "participants", args: [account] });
   const role = Number(participant[0]);
   if (participant[1] && (role === 2 || role === 3)) return;
-  const hash = await getWalletClient(account).writeContract({ address: contractAddress, abi: solarShareAbi, functionName: "registerParticipant", args: [2], gas: contractGasLimit });
+  const hash = await writeContractWithGas(account, { address: contractAddress, abi: solarShareAbi, functionName: "registerParticipant", args: [2] });
   const receipt = await publicClient.waitForTransactionReceipt({ hash });
   if (receipt.status !== "success") throw new Error("Buyer registration failed");
 }

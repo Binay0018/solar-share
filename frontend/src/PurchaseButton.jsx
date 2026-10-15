@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { contractAddress, contractGasLimit, decodeContractEvent, ensureConsumer, ensureSepoliaNetwork, getPublicClient, getWalletClient, priceToWei, solarShareAbi } from "./contractClient.js";
+import { contractAddress, decodeContractEvent, ensureConsumer, ensureSepoliaNetwork, getPublicClient, priceToWei, solarShareAbi, writeContractWithGas } from "./contractClient.js";
 import { userErrorMessage } from "./FlowComponents.jsx";
 
 export default function PurchaseButton({ offer, wallet, onComplete, onCompletePurchase }) {
@@ -45,13 +45,12 @@ export default function PurchaseButton({ offer, wallet, onComplete, onCompletePu
       onComplete?.("Confirm in MetaMask: register as a consumer if needed...");
       await ensureConsumer(wallet);
       onComplete?.("Confirm in MetaMask: purchase energy on-chain...");
-      const hash = await getWalletClient(wallet).writeContract({
+      const hash = await writeContractWithGas(wallet, {
         address: contractAddress,
         abi: solarShareAbi,
         functionName: "purchaseEnergy",
         args: [BigInt(offer.onChainOfferId), BigInt(kWhToBuy)],
-        value: BigInt(kWhToBuy) * priceWei,
-        gas: contractGasLimit
+        value: BigInt(kWhToBuy) * priceWei
       });
       onComplete?.("Purchase submitted. Waiting for Sepolia confirmation...");
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
