@@ -234,8 +234,11 @@ function App() {
       <header className="flow-header">
         <div className="flow-header-inner">
           <NavLink className="flow-brand" to="/" onClick={() => setNavOpen(false)}>
-            <span className="flow-brand-mark" aria-hidden="true">☼</span>
-            <span className="flow-brand-text">SolarShare<small>P2P solar microgrid</small></span>
+            <img className="flow-brand-mark" src="/logo-mark.png" alt="" width="38" height="38" />
+            <span className="flow-brand-text">
+              <img className="flow-brand-wordmark" src="/logo-wordmark.png" alt="SolarShare" width="104" height="18" />
+              <small>P2P solar microgrid</small>
+            </span>
           </NavLink>
           <nav className="flow-nav" aria-label="Main navigation">
             {NAV_ITEMS.map(([path, label]) => (
@@ -290,7 +293,10 @@ function App() {
       </main>
 
       <footer className="flow-footer">
-        <span className="flow-footer-group">SolarShare · Sepolia energy trading prototype · Settlements confirmed on-chain only</span>
+        <span className="flow-footer-group">
+          <img className="flow-footer-logo" src="/logo.png" alt="SolarShare" width="122" height="47" />
+          <span>Sepolia energy trading prototype · Settlements confirmed on-chain only</span>
+        </span>
         <span className="flow-footer-group">Contract {contractAddress ? <><AddressTag address={contractAddress} /> · <a href={`https://sepolia.etherscan.io/address/${contractAddress}`} target="_blank" rel="noreferrer">View on Etherscan</a></> : "not configured"}</span>
       </footer>
     </div>

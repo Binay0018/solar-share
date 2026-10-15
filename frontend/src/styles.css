@@ -221,20 +221,22 @@ button {
 }
 
 .flow-brand-mark {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  background: linear-gradient(150deg, var(--sun) 0%, var(--saffron) 100%);
-  color: #3d2700;
-  font-size: 19px;
-  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.35);
+  display: block;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.flow-brand-wordmark {
+  display: block;
+  width: 104px;
+  height: auto;
 }
 
 .flow-brand-text {
   display: grid;
-  gap: 1px;
+  gap: 2px;
 }
 
 .flow-brand-text small {
@@ -466,8 +468,14 @@ button {
 .flow-footer .flow-footer-group {
   display: inline-flex;
   align-items: center;
-  gap: var(--s-2);
+  gap: var(--s-3);
   flex-wrap: wrap;
+}
+
+.flow-footer-logo {
+  display: block;
+  width: 122px;
+  height: auto;
 }
 
 /* ==========================================================================
@@ -1685,6 +1693,8 @@ button {
 
 @media (max-width: 620px) {
   .flow-brand-text small { display: none; }
+  .flow-brand-mark { width: 30px; height: 30px; }
+  .flow-brand-wordmark { width: 84px; }
   .flow-hero { padding: var(--s-5); }
   .flow-panel { padding: var(--s-4); }
   .flow-stat-grid { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
