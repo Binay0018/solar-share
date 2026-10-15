@@ -1,14 +1,280 @@
-import { isAddress } from "viem";
+import { formatUnits } from "viem";
 import EnergyOffer from "../models/EnergyOffer.js";
 import MatchLog from "../models/MatchLog.js";
 import MatchingState from "../models/MatchingState.js";
 import TradeRequest from "../models/TradeRequest.js";
 import Transaction from "../models/Transaction.js";
 import { getContractBuyerAddress, getContractSellerAddress, purchaseMatchOnChain } from "./contractService.js";
+import { MAX_CANDIDATE_OFFERS, OFFER_SORT, planFills, weiToRupees } from "./matchingEngine.js";
 
 // Serializes matching runs so concurrent meter readings, offers, and trade
 // requests can never match (and save) the same pair twice.
 let matchingInProgress = false;
+
+// How many times a single listing may fail on-chain before the run gives up on
+// it. Repairs make the listing retryable with corrected data, but this stops a
+// listing that keeps changing on-chain from looping forever.
+const MAX_ATTEMPTS_PER_OFFER = 2;
+
+// Upper bound on planning passes for one request. Every pass either buys at
+// least one kWh or burns one of the per-listing attempts above.
+const MAX_PLAN_PASSES = MAX_CANDIDATE_OFFERS * (MAX_ATTEMPTS_PER_OFFER + 1);
+
+function matchingContext() {
+  return {
+    configuredBuyer: getContractBuyerAddress(),
+    configuredSeller: getContractSellerAddress()
+  };
+}
+
+// Candidate listings for one request, filtered and ordered by the same
+// price-time rules the engine applies. Loading this per request (instead of one
+// global snapshot) means a request never plans against quantities that an
+// earlier request already consumed in the same run.
+async function loadCandidateOffers(request) {
+  return EnergyOffer.find({
+    status: "open",
+    kWhAvailable: { $gte: 1 },
+    pricePerKWh: { $gt: 0, $lte: Number(request.maxPricePerKWh) }
+  })
+    .sort(OFFER_SORT)
+    .limit(MAX_CANDIDATE_OFFERS)
+    .lean();
+}
+
+/**
+ * The exact fills the matcher would buy right now for this request. Runs the
+ * same engine function as attemptMatches, so the buyer preview cannot promise a
+ * fill the matcher would refuse. Read-only: nothing is claimed or purchased.
+ */
+export async function previewMatch({ buyerId, kWhNeeded, maxPricePerKWh }) {
+  const request = { buyerId, kWhNeeded, maxPricePerKWh };
+  const offers = await loadCandidateOffers(request);
+  const plan = planFills({ request, offers, context: matchingContext() });
+
+  return {
+    requestedKWh: plan.requestedKWh,
+    filledKWh: plan.filledKWh,
+    remainingKWh: plan.remainingKWh,
+    totalPrice: plan.totalPrice,
+    totalWei: plan.totalWei,
+    averageRate: plan.averageRate,
+    escrowEth: formatUnits(BigInt(plan.totalWei), 18),
+    fills: plan.fills.map((fill) => ({
+      sellerId: fill.sellerId,
+      kWh: fill.kWh,
+      pricePerKWh: fill.pricePerKWh,
+      totalPrice: weiToRupees(fill.totalWei),
+      onChainOfferId: fill.onChainOfferId
+    }))
+  };
+}
+
+// Correct the marketplace record from what the chain actually reports, so a
+// stale listing is repaired instead of silently skipped forever.
+async function repairOfferFromChainError(offer, error, kWhTraded) {
+  const staleQuantity = error.message.match(/On-chain offer has only (\d+) kWh available/);
+  if (staleQuantity) {
+    const actualAvailable = Number.parseInt(staleQuantity[1], 10);
+    await EnergyOffer.findByIdAndUpdate(offer._id, {
+      kWhAvailable: actualAvailable,
+      status: actualAvailable > 0 ? "open" : "settled"
+    });
+    return actualAvailable > 0;
+  }
+
+  if (Number.isSafeInteger(error.onChainOfferId)) {
+    await EnergyOffer.findByIdAndUpdate(offer._id, {
+      kWhAvailable: error.createdOfferAvailableKWh,
+      status: error.createdOfferAvailableKWh > 0 ? "open" : "settled",
+      onChainOfferId: error.onChainOfferId
+    });
+    return error.createdOfferAvailableKWh > 0;
+  }
+
+  // The seller changed the price on-chain. The chain price is what a buyer
+  // actually pays, so mirror it and decide again on the next plan pass.
+  if (error.onChainPriceWei) {
+    await EnergyOffer.findByIdAndUpdate(offer._id, {
+      pricePerKWh: Number(formatUnits(BigInt(error.onChainPriceWei), 10))
+    });
+    return true;
+  }
+
+  // Unknown failure: put the claimed quantity back and stop using this listing.
+  await EnergyOffer.findByIdAndUpdate(offer._id, { $inc: { kWhAvailable: kWhTraded } });
+  return false;
+}
+
+// Buy one request's energy, cheapest eligible listing first, re-planning after
+// every purchase so later picks always see fresh quantities. A listing that
+// fails on-chain is repaired and either retried with its true values or dropped
+// for the rest of the run.
+async function fillRequest(request, context, results) {
+  const attempts = new Map();
+  const fills = [];
+  let remainingKWh = Math.floor(Number(request.kWhNeeded));
+  let guard = 0;
+
+  while (remainingKWh >= 1 && guard < MAX_PLAN_PASSES) {
+    guard += 1;
+
+    // Listings that already used up their attempt budget are excluded from the
+    // plan entirely, so the greedy fill still reaches the next-best listing
+    // instead of stopping short.
+    const exhausted = [...attempts.entries()]
+      .filter(([, count]) => count >= MAX_ATTEMPTS_PER_OFFER)
+      .map(([offerId]) => offerId);
+
+    const offers = await loadCandidateOffers({ ...request, kWhNeeded: remainingKWh });
+    const plan = planFills({
+      request: { ...request, kWhNeeded: remainingKWh },
+      offers,
+      context,
+      excludeOfferIds: exhausted
+    });
+    const fill = plan.fills[0];
+    if (!fill) break;
+
+    const offer = fill.offer;
+    const kWhToTake = fill.kWh;
+    const offerKey = String(offer._id);
+    attempts.set(offerKey, (attempts.get(offerKey) ?? 0) + 1);
+
+    // Atomically claim the listing so a concurrent run can never oversell it.
+    const claimed = await EnergyOffer.findOneAndUpdate(
+      { _id: offer._id, status: "open", kWhAvailable: { $gte: kWhToTake } },
+      { $inc: { kWhAvailable: -kWhToTake } },
+      { new: true }
+    );
+    if (!claimed) continue;
+
+    try {
+      const purchase = await purchaseMatchOnChain({
+        offer: claimed,
+        buyerId: request.buyerId,
+        kWhTraded: kWhToTake
+      });
+
+      const newOfferKWh = purchase.availableKWh;
+      await EnergyOffer.findByIdAndUpdate(offer._id, {
+        kWhAvailable: newOfferKWh,
+        status: newOfferKWh > 0 ? "open" : "settled",
+        onChainOfferId: purchase.onChainOfferId
+      });
+
+      // The rupees recorded in the ledger come from the wei the contract
+      // actually escrowed, so the two can never disagree.
+      const totalPriceWei = BigInt(purchase.totalPriceWei);
+      const totalPrice = weiToRupees(totalPriceWei);
+
+      await Transaction.create({
+        offerId: offer._id,
+        requestId: request._id,
+        sellerId: offer.sellerId,
+        buyerId: request.buyerId,
+        kWhTraded: kWhToTake,
+        totalPrice,
+        totalPriceWei: purchase.totalPriceWei,
+        purchaseTxHash: purchase.purchaseTxHash,
+        onChainTradeId: purchase.tradeId,
+        createOfferTxHash: purchase.createOfferTxHash,
+        purchaseGasUsed: purchase.purchaseGasUsed,
+        purchaseGasPrice: purchase.purchaseGasPrice,
+        settledAt: null
+      });
+
+      // A fill is "awaiting_seller": the energy is bought and escrowed, but
+      // only the seller's own wallet can release the funds.
+      fills.push({
+        offerId: offer._id,
+        sellerId: offer.sellerId,
+        kWh: kWhToTake,
+        pricePerKWh: offer.pricePerKWh,
+        status: "awaiting_seller",
+        purchaseTxHash: purchase.purchaseTxHash,
+        onChainTradeId: purchase.tradeId
+      });
+
+      remainingKWh -= kWhToTake;
+
+      await MatchLog.create({
+        offerId: offer._id,
+        requestId: request._id,
+        status: "success",
+        reason: "purchased on-chain — awaiting seller settlement",
+        kWhMatched: kWhToTake,
+        totalPrice,
+        txHash: purchase.purchaseTxHash
+      });
+
+      results.push({
+        status: "awaiting_seller",
+        offerId: offer._id,
+        requestId: request._id,
+        txHash: purchase.purchaseTxHash,
+        onChain: true,
+        tradeId: purchase.tradeId,
+        kWh: kWhToTake,
+        sellerId: offer.sellerId
+      });
+    } catch (error) {
+      const retryable = await repairOfferFromChainError(offer, error, kWhToTake);
+      if (!retryable) attempts.set(offerKey, MAX_ATTEMPTS_PER_OFFER);
+
+      fills.push({
+        offerId: offer._id,
+        sellerId: offer.sellerId,
+        kWh: kWhToTake,
+        pricePerKWh: offer.pricePerKWh,
+        status: "failed",
+        failureReason: error.message
+      });
+
+      await MatchLog.create({
+        offerId: offer._id,
+        requestId: request._id,
+        status: "failure",
+        reason: error.message,
+        kWhMatched: kWhToTake,
+        totalPrice: weiToRupees(fill.totalWei)
+      });
+
+      results.push({
+        status: "failure",
+        offerId: offer._id,
+        requestId: request._id,
+        reason: error.message
+      });
+    }
+  }
+
+  const totalFilled = Number(request.kWhNeeded) - remainingKWh;
+  const finalStatus = remainingKWh < 0.001 ? "filled" : "partially_filled";
+
+  await TradeRequest.findByIdAndUpdate(request._id, {
+    kWhNeeded: remainingKWh,
+    status: finalStatus,
+    $push: { fills }
+  });
+
+  if (fills.length > 0) {
+    results.push({
+      status: finalStatus,
+      requestId: request._id,
+      totalFilled,
+      remainingKWh,
+      fillCount: fills.length,
+      fills: fills.map((fill) => ({
+        sellerId: fill.sellerId,
+        kWh: fill.kWh,
+        pricePerKWh: fill.pricePerKWh,
+        status: fill.status,
+        txHash: fill.txHash
+      }))
+    });
+  }
+}
 
 export async function attemptMatches() {
   if (matchingInProgress) {
@@ -36,21 +302,12 @@ export async function attemptMatches() {
       { $set: { status: "open" } }
     );
 
-    // Process open requests that still need energy
-    const requestFilter = { status: "open", kWhNeeded: { $gt: 0 } };
-
-    // Price-time priority: cheapest first, then earliest
-    const offers = await EnergyOffer.find({ status: "open", kWhAvailable: { $gt: 0 } })
-      .sort({ pricePerKWh: 1, createdAt: 1 })
-      .limit(50)
-      .lean();
-    const requests = await TradeRequest.find(requestFilter)
+    const requests = await TradeRequest.find({ status: "open", kWhNeeded: { $gt: 0 } })
       .sort({ createdAt: 1 })
       .limit(50)
       .lean();
     const results = [];
-    const configuredBuyer = getContractBuyerAddress();
-    const configuredSeller = getContractSellerAddress();
+    const context = matchingContext();
 
     for (const request of requests) {
       // Per-request lock: skip if already being processed
@@ -61,189 +318,7 @@ export async function attemptMatches() {
       );
       if (!locked) continue;
 
-      let remainingKWh = request.kWhNeeded;
-      const fills = [];
-      let anyFailed = false;
-
-      // Greedy selection: iterate offers sorted by price ascending, then time
-      for (const offer of offers) {
-        if (remainingKWh < 1) break;
-        if (offer.status !== "open") continue;
-        if (offer.sellerId.toLowerCase() === request.buyerId.toLowerCase()) continue;
-        if (offer.pricePerKWh <= 0 || offer.pricePerKWh > request.maxPricePerKWh) continue;
-        if (
-          !configuredBuyer ||
-          !isAddress(request.buyerId) ||
-          request.buyerId.toLowerCase() !== configuredBuyer.toLowerCase()
-        ) {
-          continue;
-        }
-
-        // The backend signs purchases from its own buyer wallet, so it can buy
-        // any listing that already exists on-chain. A listing that only exists
-        // in MongoDB must first be created on-chain, which needs the configured
-        // seller key, so those are only eligible when the seller key owns them.
-        const offerIsOnChain = Number.isInteger(offer.onChainOfferId);
-        const sellerIsConfigured =
-          isAddress(offer.sellerId) &&
-          Boolean(configuredSeller) &&
-          offer.sellerId.toLowerCase() === configuredSeller.toLowerCase();
-        if (!offerIsOnChain && !sellerIsConfigured) continue;
-
-        const kWhToTake = Math.floor(Math.min(offer.kWhAvailable, remainingKWh));
-        if (kWhToTake < 1) continue;
-
-        // Atomically claim the offer
-        const claimed = await EnergyOffer.findOneAndUpdate(
-          { _id: offer._id, status: "open", kWhAvailable: { $gte: kWhToTake } },
-          { $inc: { kWhAvailable: -kWhToTake } },
-          { new: true }
-        );
-        if (!claimed) {
-          continue;
-        }
-
-        try {
-          const purchase = await purchaseMatchOnChain({ offer: claimed, buyerId: request.buyerId, kWhTraded: kWhToTake });
-
-          const newOfferKWh = purchase.availableKWh;
-          await EnergyOffer.findByIdAndUpdate(offer._id, {
-            kWhAvailable: newOfferKWh,
-            status: newOfferKWh > 0 ? "open" : "settled",
-            onChainOfferId: purchase.onChainOfferId
-          });
-
-          // Create transaction record — NO settlement yet, just the purchase
-          const transaction = await Transaction.create({
-            offerId: offer._id,
-            requestId: request._id,
-            sellerId: offer.sellerId,
-            buyerId: request.buyerId,
-            kWhTraded: kWhToTake,
-            totalPrice: Number((kWhToTake * offer.pricePerKWh).toFixed(2)),
-            totalPriceWei: purchase.totalPriceWei,
-            purchaseTxHash: purchase.purchaseTxHash,
-            onChainTradeId: purchase.tradeId,
-            createOfferTxHash: purchase.createOfferTxHash,
-            purchaseGasUsed: purchase.purchaseGasUsed,
-            purchaseGasPrice: purchase.purchaseGasPrice,
-            settledAt: null
-          });
-
-          // Add fill to request — status is "awaiting_seller", NOT "settled"
-          fills.push({
-            offerId: offer._id,
-            sellerId: offer.sellerId,
-            kWh: kWhToTake,
-            pricePerKWh: offer.pricePerKWh,
-            status: "awaiting_seller",
-            purchaseTxHash: purchase.purchaseTxHash,
-            onChainTradeId: purchase.tradeId
-          });
-
-          remainingKWh = Number((remainingKWh - kWhToTake).toFixed(3));
-
-          await MatchLog.create({
-            offerId: offer._id,
-            requestId: request._id,
-            status: "success",
-            reason: "purchased on-chain — awaiting seller settlement",
-            kWhMatched: kWhToTake,
-            totalPrice: Number((kWhToTake * offer.pricePerKWh).toFixed(2)),
-            txHash: purchase.purchaseTxHash
-          });
-
-          results.push({
-            status: "awaiting_seller",
-            offerId: offer._id,
-            requestId: request._id,
-            txHash: purchase.purchaseTxHash,
-            onChain: true,
-            tradeId: purchase.tradeId,
-            kWh: kWhToTake,
-            sellerId: offer.sellerId
-          });
-        } catch (error) {
-          // Check if offer was stale on-chain (e.g. 0 kWh remaining)
-          const staleMatch = error.message.match(/On-chain offer has only (\d+) kWh available/);
-          if (staleMatch) {
-            const actualAvailable = parseInt(staleMatch[1], 10);
-            await EnergyOffer.findByIdAndUpdate(offer._id, {
-              kWhAvailable: actualAvailable,
-              status: actualAvailable > 0 ? "open" : "settled"
-            });
-          } else if (Number.isSafeInteger(error.onChainOfferId)) {
-            await EnergyOffer.findByIdAndUpdate(offer._id, {
-              kWhAvailable: error.createdOfferAvailableKWh,
-              status: error.createdOfferAvailableKWh > 0 ? "open" : "settled",
-              onChainOfferId: error.onChainOfferId
-            });
-          } else {
-            // Release the offer claim for non-stale errors
-            await EnergyOffer.findByIdAndUpdate(offer._id, {
-              $inc: { kWhAvailable: kWhToTake }
-            });
-          }
-
-          // Mark fill as failed
-          fills.push({
-            offerId: offer._id,
-            sellerId: offer.sellerId,
-            kWh: kWhToTake,
-            pricePerKWh: offer.pricePerKWh,
-            status: "failed",
-            failureReason: error.message
-          });
-
-          await MatchLog.create({
-            offerId: offer._id,
-            requestId: request._id,
-            status: "failure",
-            reason: error.message,
-            kWhMatched: kWhToTake,
-            totalPrice: Number((kWhToTake * offer.pricePerKWh).toFixed(2))
-          });
-
-          results.push({
-            status: "failure",
-            offerId: offer._id,
-            requestId: request._id,
-            reason: error.message
-          });
-
-          anyFailed = true;
-          // Continue to next available offer instead of aborting the whole request
-          continue;
-        }
-      }
-
-      // Update request with fills
-      const totalFilled = request.kWhNeeded - remainingKWh;
-      const allSucceeded = !anyFailed;
-      const finalStatus = allSucceeded && remainingKWh < 0.001 ? "filled" : "partially_filled";
-
-      await TradeRequest.findByIdAndUpdate(request._id, {
-        kWhNeeded: remainingKWh,
-        status: finalStatus,
-        $push: { fills: fills }
-      });
-
-      if (fills.length > 0) {
-        results.push({
-          status: allSucceeded ? "filled" : "partially_filled",
-          requestId: request._id,
-          totalFilled: Number(totalFilled.toFixed(3)),
-          remainingKWh: Number(remainingKWh.toFixed(3)),
-          fillCount: fills.length,
-          fills: fills.map(f => ({
-            sellerId: f.sellerId,
-            kWh: f.kWh,
-            pricePerKWh: f.pricePerKWh,
-            status: f.status,
-            txHash: f.txHash
-          }))
-        });
-      }
+      await fillRequest(request, context, results);
     }
 
     // Update persistent state

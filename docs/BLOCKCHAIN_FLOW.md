@@ -61,7 +61,13 @@ sequenceDiagram
 
 ## Off-chain matching path
 
-`POST /trades` accepts a positive whole-kWh request only when its `buyerId` equals the address controlled by `BUYER_PRIVATE_KEY`. The matcher selects open offers by lowest price and then creation time, and only matches offers whose seller address is controlled by `SELLER_PRIVATE_KEY`. It atomically claims the MongoDB quantity before calling the chain, then reconciles availability from the chain. Each successful fill is a separate purchase and remains pending until that seller settles. The API initially returns the request; matching runs asynchronously.
+`POST /trades` accepts a positive whole-kWh request only when its `buyerId` equals the address controlled by `BUYER_PRIVATE_KEY`, because the backend signs every matched purchase from that wallet. Matching runs asynchronously after the API responds.
+
+One engine decides the fills. `matchingEngine.js` holds the only copy of the eligibility rules and of the price-time ordering — lowest rate, then earliest listing, then listing id so a tie can never resolve differently twice. Both the background matcher and `POST /trades/preview` call it, so the buyer's preview is the plan the matcher would execute rather than an estimate. The preview is read-only: it claims nothing and buys nothing.
+
+A listing that already exists on-chain is buyable by the backend buyer whatever wallet owns it, including a plain MetaMask seller. A listing that exists only in MongoDB must first be published on-chain, which requires `SELLER_PRIVATE_KEY`, so those are eligible only when that key owns them. The matcher claims MongoDB quantity atomically before touching the chain, re-plans after each purchase so later picks see fresh quantities, and repairs the mirror from chain errors (reduced or exhausted quantity, or a price the seller changed on-chain) instead of silently skipping the listing. Each successful fill is a separate purchase and stays pending until that seller settles.
+
+Ledger rupees are derived from the wei the contract actually escrowed, so a repeating rate cannot make the recorded value drift from the chain value.
 
 The separate direct marketplace path is not restricted to the backend's buyer key: the connected MetaMask buyer purchases directly. Both paths require the seller wallet to settle the on-chain trade.
 

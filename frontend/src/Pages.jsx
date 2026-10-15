@@ -217,26 +217,32 @@ export function BuyPage({ wallet, role, offers, trades, transactions, loading, o
   const buyerTransactions = wallet ? transactions.filter((transaction) => transaction.buyerId?.toLowerCase() === wallet.toLowerCase()) : [];
   const purchased = buyerTransactions.filter((transaction) => transaction.settledAt);
   const directPurchases = buyerTransactions.filter((transaction) => !transaction.requestId);
-  const compatibleOffers = useMemo(() => offers.filter((offer) =>
-    offer.status === "open" &&
-    Number(offer.kWhAvailable) > 0 &&
-    (!wallet || offer.sellerId?.toLowerCase() !== wallet.toLowerCase()) &&
-    Number(offer.pricePerKWh) <= (Number(form.maxPrice) || 0)
-  ).sort((left, right) => Number(left.pricePerKWh) - Number(right.pricePerKWh)), [offers, wallet, form.maxPrice]);
-  const preview = useMemo(() => {
-    const requested = Math.floor(Number(form.kWh) || 0);
-    let remaining = requested;
-    const fills = compatibleOffers.flatMap((offer) => {
-      if (!remaining) return [];
-      const quantity = Math.min(remaining, Math.floor(Number(offer.kWhAvailable)));
-      remaining -= quantity;
-      return quantity > 0 ? [{ offer, quantity }] : [];
-    });
-    const filled = requested - remaining;
-    const value = fills.reduce((sum, fill) => sum + fill.quantity * Number(fill.offer.pricePerKWh), 0);
-    const wei = fills.reduce((sum, fill) => sum + BigInt(fill.quantity) * priceToWei(fill.offer.pricePerKWh), 0n);
-    return { requested, remaining, filled, fills, value, average: filled ? value / filled : 0, eth: formatEther(wei) };
-  }, [form.kWh, compatibleOffers]);
+  const [preview, setPreview] = useState(null);
+
+  // Ask the backend for the plan instead of re-implementing the matcher here, so
+  // the preview can never promise a fill the matcher would refuse.
+  useEffect(() => {
+    const kWhNeeded = Number(form.kWh);
+    const maxPricePerKWh = Number(form.maxPrice);
+    if (!wallet || !Number.isSafeInteger(kWhNeeded) || kWhNeeded < 1 || !Number.isFinite(maxPricePerKWh) || maxPricePerKWh <= 0) {
+      setPreview(null);
+      return undefined;
+    }
+    const controller = new AbortController();
+    const timer = setTimeout(() => {
+      apiRequest("/trades/preview", {
+        method: "POST",
+        body: JSON.stringify({ buyerId: wallet, kWhNeeded, maxPricePerKWh }),
+        signal: controller.signal
+      }).then(setPreview).catch((cause) => {
+        if (cause?.name !== "AbortError") setPreview(null);
+      });
+    }, 300);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [wallet, form.kWh, form.maxPrice, offers]);
 
   async function submitRequest(event) {
     event.preventDefault();
@@ -281,16 +287,16 @@ export function BuyPage({ wallet, role, offers, trades, transactions, loading, o
       <div className="flow-grid-two">
         <section className="flow-panel">
           <PanelTitle eyebrow="MATCHED REQUEST" title="Request energy" />
-          <p className="flow-copy">The fill preview uses the current marketplace listings and is indicative. When you submit, the backend matcher buys the cheapest eligible listings on-chain with the platform buyer wallet (BUYER_PRIVATE_KEY), so the connected wallet must be that buyer wallet. Each seller then settles their own purchase from their own wallet; nothing reaches the ledger before that.</p>
+          <p className="flow-copy">The fill preview is produced by the matcher itself — the same price-time engine that runs when you submit — so it shows exactly which listings would be bought. On submit the backend buys the cheapest eligible listings on-chain with the platform buyer wallet (BUYER_PRIVATE_KEY), so the connected wallet must be that buyer wallet. Each seller then settles their own purchase from their own wallet; nothing reaches the ledger before that.</p>
           <form className="flow-form" onSubmit={submitRequest}>
             <label>Energy needed (whole kWh)<input type="number" min="1" step="1" value={form.kWh} onChange={(event) => setForm({ ...form, kWh: event.target.value })} required /></label>
             <label>Maximum rate (₹ / kWh)<input type="number" min="0.01" step="0.01" value={form.maxPrice} onChange={(event) => setForm({ ...form, maxPrice: event.target.value })} required /></label>
-            {preview.requested > 0 && <div className="flow-fill-preview">
-              <strong>Fill preview · cheapest eligible offers first</strong>
-              {preview.fills.length ? preview.fills.map(({ offer, quantity }) => <div key={offer._id}><AddressTag address={offer.sellerId} /> · {quantity} kWh @ ₹{Number(offer.pricePerKWh).toFixed(2)}/kWh</div>) : <p>No offers match this price yet.</p>}
-              <div>Average listing rate: ₹{preview.average.toFixed(2)}/kWh · Estimated listing value: ₹{preview.value.toFixed(2)}</div>
-              <div>Contract escrow preview: {Number(preview.eth).toExponential(4)} ETH</div>
-              {preview.remaining > 0 && <p className="flow-warning">Only {preview.filled} of {preview.requested} kWh is currently available at this price.</p>}
+            {preview && preview.requestedKWh > 0 && <div className="flow-fill-preview">
+              <strong>Fill preview · cheapest eligible listings first</strong>
+              {preview.fills.length ? preview.fills.map((fill, index) => <div key={`${fill.sellerId}-${fill.onChainOfferId ?? "pending"}-${index}`}><AddressTag address={fill.sellerId} /> · {fill.kWh} kWh @ ₹{fill.pricePerKWh.toFixed(2)}/kWh</div>) : <p>No eligible listings match this price yet.</p>}
+              <div>Average matched rate: ₹{preview.averageRate.toFixed(2)}/kWh · Matched value: ₹{preview.totalPrice.toFixed(2)}</div>
+              <div>Contract escrow: {Number(preview.escrowEth).toExponential(4)} ETH</div>
+              {preview.remainingKWh > 0 && <p className="flow-warning">Only {preview.filledKWh} of {preview.requestedKWh} kWh can be matched right now.</p>}
             </div>}
             {error && <div className="flow-inline-error" role="alert">{error}</div>}
             <button className="flow-primary" disabled={submitting}>{submitting ? "Submitting…" : "Submit matched request"}</button>

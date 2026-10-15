@@ -137,7 +137,9 @@ export async function purchaseMatchOnChain({ offer, buyerId, kWhTraded }) {
       }
       onChainCapacity = Number(chainOffer[2]);
       if (chainOffer[3] !== priceToWei(offer.pricePerKWh)) {
-        throw new Error("on-chain offer price no longer matches the marketplace price");
+        const mismatch = new Error("on-chain offer price no longer matches the marketplace price");
+        mismatch.onChainPriceWei = chainOffer[3].toString();
+        throw mismatch;
       }
       return chainOffer[3];
     })

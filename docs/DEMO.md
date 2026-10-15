@@ -59,7 +59,7 @@
 3. In **"Request energy"** panel:
    - Enter `7` in "Energy needed (whole kWh)"
    - Enter `6.00` in "Maximum rate (₹ / kWh)`
-4. **See fill preview:** Shows which offers will be used, kWh from each, average price, total ETH, escrow preview
+4. **See fill preview:** Produced by the matcher itself — the listings it would buy, kWh from each, average matched rate, matched value, and the ETH the contract would escrow
 5. If supply < requested, see warning: "Only X of 7 kWh is currently available at this price"
 6. Click **"Submit matched request"**
 7. **Verify:** Success toast: "Request accepted. The backend signs purchaseEnergy with BUYER_PRIVATE_KEY; each registered seller signs settlement."
