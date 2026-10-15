@@ -1,90 +1,76 @@
 import { useState } from "react";
-import { contractAddress, contractGasLimit, decodeContractEvent, ensureConsumer, getPublicClient, getWalletClient, priceToWei, solarShareAbi } from "./contractClient.js";
+import { contractAddress, contractGasLimit, decodeContractEvent, ensureConsumer, ensureSepoliaNetwork, getPublicClient, getWalletClient, priceToWei, solarShareAbi } from "./contractClient.js";
+import { userErrorMessage } from "./FlowComponents.jsx";
 
 export default function PurchaseButton({ offer, wallet, onComplete, onCompletePurchase }) {
   const [loading, setLoading] = useState(false);
+  const hasOnChainOffer = Boolean(
+    Number.isSafeInteger(offer.onChainOfferId) &&
+    /^0x[0-9a-fA-F]{40}$/.test(offer.sellerId)
+  );
 
   async function purchase() {
     if (loading) return;
     setLoading(true);
     try {
       const apiBase = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
-      const kWhAvailable = Math.floor(Number(offer.kWhAvailable));
-      if (kWhAvailable < 1) {
-        onComplete?.("❌ This offer has less than 1 kWh available — too small for an on-chain trade.");
-        return;
+      if (!wallet) throw new Error("Connect the buyer's MetaMask wallet before purchasing");
+      if (!contractAddress || !Number.isSafeInteger(offer.onChainOfferId) || !/^0x[0-9a-fA-F]{40}$/.test(offer.sellerId)) {
+        throw new Error("This offer is not connected to an on-chain seller and offer");
+      }
+      await ensureSepoliaNetwork();
+
+      const publicClient = getPublicClient();
+      const chainOffer = await publicClient.readContract({
+        address: contractAddress,
+        abi: solarShareAbi,
+        functionName: "offers",
+        args: [BigInt(offer.onChainOfferId)]
+      });
+      if (chainOffer[1].toLowerCase() !== offer.sellerId.toLowerCase()) {
+        throw new Error("On-chain seller does not match this marketplace offer");
+      }
+      const availableOnChain = Number(chainOffer[2]);
+      const availableInMarketplace = Math.floor(Number(offer.kWhAvailable));
+      const kWhToBuy = Math.min(availableInMarketplace, availableOnChain);
+      if (!Number.isSafeInteger(availableOnChain) || kWhToBuy < 1) {
+        throw new Error("This offer has no whole kWh remaining on-chain");
       }
 
-      const buyerId = wallet || `consumer-${Math.random().toString(36).slice(2, 8)}`;
+      const priceWei = chainOffer[3];
+      if (priceWei !== priceToWei(offer.pricePerKWh)) {
+        throw new Error("The on-chain price differs from the marketplace listing; refresh and try again");
+      }
 
-      // Create a trade request first — this triggers the matching engine
-      onComplete?.("Creating trade request...");
-      const tradeResponse = await fetch(`${apiBase}/trades`, {
+      onComplete?.("Confirm in MetaMask: register as a consumer if needed...");
+      await ensureConsumer(wallet);
+      onComplete?.("Confirm in MetaMask: purchase energy on-chain...");
+      const hash = await getWalletClient(wallet).writeContract({
+        address: contractAddress,
+        abi: solarShareAbi,
+        functionName: "purchaseEnergy",
+        args: [BigInt(offer.onChainOfferId), BigInt(kWhToBuy)],
+        value: BigInt(kWhToBuy) * priceWei,
+        gas: contractGasLimit
+      });
+      onComplete?.("Purchase submitted. Waiting for Sepolia confirmation...");
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+      if (receipt.status !== "success") throw new Error("Purchase transaction failed on-chain");
+      decodeContractEvent(receipt, "TradePurchased");
+
+      const response = await fetch(`${apiBase}/transactions/confirm-purchase`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          buyerId,
-          kWhNeeded: kWhAvailable,
-          maxPricePerKWh: offer.pricePerKWh
-        })
+        body: JSON.stringify({ offerId: offer._id, buyerId: wallet, purchaseTxHash: hash })
       });
-      const tradeData = await tradeResponse.json();
-      if (!tradeResponse.ok) throw new Error(tradeData.error || "Trade request failed");
-
-      const pending = tradeData.matching?.results?.find((r) => r.status === "pending");
-      const success = tradeData.matching?.results?.find((r) => r.status === "success");
-
-      if (wallet && window.ethereum && contractAddress && pending) {
-        // MetaMask-assisted flow: buyer signs purchaseEnergy, backend settles
-        onComplete?.("Confirm in MetaMask: register wallet as consumer if needed...");
-        await ensureConsumer(wallet);
-        onComplete?.("Confirm in MetaMask: purchase energy on-chain...");
-
-        // Read the on-chain offer to get the exact available kWh
-        const onChainOffer = await getPublicClient().readContract({
-          address: contractAddress,
-          abi: solarShareAbi,
-          functionName: "offers",
-          args: [BigInt(offer.onChainOfferId)]
-        });
-        const onChainKWh = Number(onChainOffer[2]);
-        const kWhToBuy = Math.min(kWhAvailable, onChainKWh);
-        if (kWhToBuy < 1) throw new Error("On-chain offer has no available kWh");
-
-        const value = kWhToBuy * priceToWei(offer.pricePerKWh);
-        const hash = await getWalletClient(wallet).writeContract({
-          address: contractAddress,
-          abi: solarShareAbi,
-          functionName: "purchaseEnergy",
-          args: [BigInt(offer.onChainOfferId), BigInt(kWhToBuy)],
-          value,
-          gas: contractGasLimit
-        });
-        onComplete?.("Purchase transaction submitted. Waiting for confirmation...");
-        const receipt = await getPublicClient().waitForTransactionReceipt({ hash });
-        if (receipt.status !== "success") throw new Error("Purchase transaction failed");
-        decodeContractEvent(receipt, "TradePurchased");
-
-        const response = await fetch(`${apiBase}/transactions/confirm-purchase`, {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({ offerId: offer._id, requestId: pending.requestId, buyerId: wallet, purchaseTxHash: hash })
-        });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || "Settlement could not be completed");
-        onCompletePurchase?.(result);
-        onComplete?.("✅ Trade settled on-chain! Transaction added to ledger.");
-      } else if (success) {
-        // Backend-assisted flow: matching engine already settled on-chain
-        onCompletePurchase?.(tradeData);
-        onComplete?.(`✅ Trade settled on-chain! Traded ${success.kWhMatched ?? kWhAvailable} kWh @ ₹${offer.pricePerKWh}/unit with ${offer.sellerId}.`);
-      } else {
-        // Seller is not the backend's SELLER_PRIVATE_KEY — they need to settle via MetaMask
-        onComplete?.("Trade request created. The seller must settle this trade via MetaMask using the Settle button.");
-        onCompletePurchase?.(tradeData);
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(`${result.error || "Purchase was confirmed on-chain, but ledger sync failed"} (tx: ${hash})`);
       }
+      onCompletePurchase?.(result);
+      onComplete?.(`✅ ${kWhToBuy} kWh purchased and escrowed. The seller must settle the trade to release payment.`);
     } catch (error) {
-      onComplete?.(`❌ ${error.message}`);
+      onComplete?.(`❌ ${userErrorMessage(error)}`);
     } finally {
       setLoading(false);
     }
@@ -92,13 +78,13 @@ export default function PurchaseButton({ offer, wallet, onComplete, onCompletePu
 
   return (
     <button
-      className="text-button"
+      className="flow-secondary"
       onClick={purchase}
-      disabled={loading}
-      style={{ opacity: loading ? 0.7 : 1, fontWeight: "600", cursor: loading ? "not-allowed" : "pointer" }}
-      title="Purchase this offer on the blockchain"
+      disabled={loading || !hasOnChainOffer}
+      style={{ opacity: loading || !hasOnChainOffer ? 0.7 : 1, fontWeight: "600", cursor: loading || !hasOnChainOffer ? "not-allowed" : "pointer" }}
+      title={hasOnChainOffer ? "Purchase this offer on the blockchain" : "This offer has not been published on-chain"}
     >
-      {loading ? "Trading..." : "Buy On-Chain"}
+      {loading ? "Trading..." : hasOnChainOffer ? "Buy On-Chain" : "Off-chain"}
     </button>
   );
 }

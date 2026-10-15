@@ -3,13 +3,16 @@ import MatchLog from "../models/MatchLog.js";
 import Transaction from "../models/Transaction.js";
 import EnergyOffer from "../models/EnergyOffer.js";
 
-export const BASELINE_RATE_PER_KWH = Number(process.env.BASELINE_RATE_PER_KWH ?? 7.5);
+export const BASELINE_RATE_PER_KWH = Number(process.env.BASELINE_RATE_PER_KWH);
 const router = Router();
 
 router.get("/", async (_request, response, next) => {
   try {
+    if (!Number.isFinite(BASELINE_RATE_PER_KWH) || BASELINE_RATE_PER_KWH <= 0) {
+      throw new Error("BASELINE_RATE_PER_KWH is not configured");
+    }
     const [transactions, matchAttempts, offers] = await Promise.all([
-      Transaction.find().populate("offerId").lean(),
+      Transaction.find({ settledAt: { $ne: null } }).populate("offerId").lean(),
       MatchLog.countDocuments({ status: { $in: ["success", "failure"] } }),
       EnergyOffer.find().select("createdAt").lean()
     ]);

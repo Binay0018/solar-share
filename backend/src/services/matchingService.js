@@ -4,7 +4,7 @@ import MatchLog from "../models/MatchLog.js";
 import MatchingState from "../models/MatchingState.js";
 import TradeRequest from "../models/TradeRequest.js";
 import Transaction from "../models/Transaction.js";
-import { purchaseMatchOnChain } from "./contractService.js";
+import { getContractBuyerAddress, getContractSellerAddress, purchaseMatchOnChain } from "./contractService.js";
 
 // Serializes matching runs so concurrent meter readings, offers, and trade
 // requests can never match (and save) the same pair twice.
@@ -36,12 +36,8 @@ export async function attemptMatches() {
       { $set: { status: "open" } }
     );
 
-    // Only process requests created after the last successful matching run
-    const state = await MatchingState.findOne({ _id: "singleton" }).lean();
+    // Process open requests that still need energy
     const requestFilter = { status: "open", kWhNeeded: { $gt: 0 } };
-    if (state?.lastMatchingRun) {
-      requestFilter.createdAt = { $gt: state.lastMatchingRun };
-    }
 
     // Price-time priority: cheapest first, then earliest
     const offers = await EnergyOffer.find({ status: "open", kWhAvailable: { $gt: 0 } })
@@ -53,6 +49,8 @@ export async function attemptMatches() {
       .limit(50)
       .lean();
     const results = [];
+    const configuredBuyer = getContractBuyerAddress();
+    const configuredSeller = getContractSellerAddress();
 
     for (const request of requests) {
       // Per-request lock: skip if already being processed
@@ -65,7 +63,7 @@ export async function attemptMatches() {
 
       let remainingKWh = request.kWhNeeded;
       const fills = [];
-      let allSucceeded = true;
+      let anyFailed = false;
 
       // Greedy selection: iterate offers sorted by price ascending, then time
       for (const offer of offers) {
@@ -73,8 +71,18 @@ export async function attemptMatches() {
         if (offer.status !== "open") continue;
         if (offer.sellerId.toLowerCase() === request.buyerId.toLowerCase()) continue;
         if (offer.pricePerKWh <= 0 || offer.pricePerKWh > request.maxPricePerKWh) continue;
+        if (
+          !configuredBuyer ||
+          !configuredSeller ||
+          !isAddress(request.buyerId) ||
+          request.buyerId.toLowerCase() !== configuredBuyer.toLowerCase() ||
+          !isAddress(offer.sellerId) ||
+          offer.sellerId.toLowerCase() !== configuredSeller.toLowerCase()
+        ) {
+          continue;
+        }
 
-        const kWhToTake = Math.min(offer.kWhAvailable, remainingKWh);
+        const kWhToTake = Math.floor(Math.min(offer.kWhAvailable, remainingKWh));
         if (kWhToTake < 1) continue;
 
         // Atomically claim the offer
@@ -84,27 +92,16 @@ export async function attemptMatches() {
           { new: true }
         );
         if (!claimed) {
-          allSucceeded = false;
-          break;
-        }
-
-        const onChainKWh = Math.floor(kWhToTake);
-        if (onChainKWh < 1) {
-          // Release the claim
-          await EnergyOffer.findByIdAndUpdate(offer._id, {
-            $inc: { kWhAvailable: kWhToTake }
-          });
           continue;
         }
 
         try {
-          const purchase = await purchaseMatchOnChain({ offer: claimed, kWhTraded: onChainKWh });
+          const purchase = await purchaseMatchOnChain({ offer: claimed, buyerId: request.buyerId, kWhTraded: kWhToTake });
 
-          // Update offer status
-          const newOfferKWh = claimed.kWhAvailable - onChainKWh;
+          const newOfferKWh = purchase.availableKWh;
           await EnergyOffer.findByIdAndUpdate(offer._id, {
             kWhAvailable: newOfferKWh,
-            status: newOfferKWh > 0.001 ? "open" : "settled",
+            status: newOfferKWh > 0 ? "open" : "settled",
             onChainOfferId: purchase.onChainOfferId
           });
 
@@ -112,35 +109,39 @@ export async function attemptMatches() {
           const transaction = await Transaction.create({
             offerId: offer._id,
             requestId: request._id,
-            kWhTraded: onChainKWh,
-            totalPrice: Number((onChainKWh * offer.pricePerKWh).toFixed(2)),
+            sellerId: offer.sellerId,
+            buyerId: request.buyerId,
+            kWhTraded: kWhToTake,
+            totalPrice: Number((kWhToTake * offer.pricePerKWh).toFixed(2)),
+            totalPriceWei: purchase.totalPriceWei,
             purchaseTxHash: purchase.purchaseTxHash,
             onChainTradeId: purchase.tradeId,
+            createOfferTxHash: purchase.createOfferTxHash,
             purchaseGasUsed: purchase.purchaseGasUsed,
             purchaseGasPrice: purchase.purchaseGasPrice,
-            settledAt: null  // NOT settled — awaiting seller authorization
+            settledAt: null
           });
 
           // Add fill to request — status is "awaiting_seller", NOT "settled"
           fills.push({
             offerId: offer._id,
             sellerId: offer.sellerId,
-            kWh: onChainKWh,
+            kWh: kWhToTake,
             pricePerKWh: offer.pricePerKWh,
             status: "awaiting_seller",
             purchaseTxHash: purchase.purchaseTxHash,
             onChainTradeId: purchase.tradeId
           });
 
-          remainingKWh = Number((remainingKWh - onChainKWh).toFixed(3));
+          remainingKWh = Number((remainingKWh - kWhToTake).toFixed(3));
 
           await MatchLog.create({
             offerId: offer._id,
             requestId: request._id,
             status: "success",
             reason: "purchased on-chain — awaiting seller settlement",
-            kWhMatched: onChainKWh,
-            totalPrice: Number((onChainKWh * offer.pricePerKWh).toFixed(2)),
+            kWhMatched: kWhToTake,
+            totalPrice: Number((kWhToTake * offer.pricePerKWh).toFixed(2)),
             txHash: purchase.purchaseTxHash
           });
 
@@ -151,20 +152,36 @@ export async function attemptMatches() {
             txHash: purchase.purchaseTxHash,
             onChain: true,
             tradeId: purchase.tradeId,
-            kWh: onChainKWh,
+            kWh: kWhToTake,
             sellerId: offer.sellerId
           });
         } catch (error) {
-          // Release the offer claim
-          await EnergyOffer.findByIdAndUpdate(offer._id, {
-            $inc: { kWhAvailable: kWhToTake }
-          });
+          // Check if offer was stale on-chain (e.g. 0 kWh remaining)
+          const staleMatch = error.message.match(/On-chain offer has only (\d+) kWh available/);
+          if (staleMatch) {
+            const actualAvailable = parseInt(staleMatch[1], 10);
+            await EnergyOffer.findByIdAndUpdate(offer._id, {
+              kWhAvailable: actualAvailable,
+              status: actualAvailable > 0 ? "open" : "settled"
+            });
+          } else if (Number.isSafeInteger(error.onChainOfferId)) {
+            await EnergyOffer.findByIdAndUpdate(offer._id, {
+              kWhAvailable: error.createdOfferAvailableKWh,
+              status: error.createdOfferAvailableKWh > 0 ? "open" : "settled",
+              onChainOfferId: error.onChainOfferId
+            });
+          } else {
+            // Release the offer claim for non-stale errors
+            await EnergyOffer.findByIdAndUpdate(offer._id, {
+              $inc: { kWhAvailable: kWhToTake }
+            });
+          }
 
           // Mark fill as failed
           fills.push({
             offerId: offer._id,
             sellerId: offer.sellerId,
-            kWh: onChainKWh,
+            kWh: kWhToTake,
             pricePerKWh: offer.pricePerKWh,
             status: "failed",
             failureReason: error.message
@@ -175,8 +192,8 @@ export async function attemptMatches() {
             requestId: request._id,
             status: "failure",
             reason: error.message,
-            kWhMatched: onChainKWh,
-            totalPrice: Number((onChainKWh * offer.pricePerKWh).toFixed(2))
+            kWhMatched: kWhToTake,
+            totalPrice: Number((kWhToTake * offer.pricePerKWh).toFixed(2))
           });
 
           results.push({
@@ -186,13 +203,15 @@ export async function attemptMatches() {
             reason: error.message
           });
 
-          allSucceeded = false;
-          break; // Stop on first failure - keep earlier fills
+          anyFailed = true;
+          // Continue to next available offer instead of aborting the whole request
+          continue;
         }
       }
 
       // Update request with fills
       const totalFilled = request.kWhNeeded - remainingKWh;
+      const allSucceeded = !anyFailed;
       const finalStatus = allSucceeded && remainingKWh < 0.001 ? "filled" : "partially_filled";
 
       await TradeRequest.findByIdAndUpdate(request._id, {

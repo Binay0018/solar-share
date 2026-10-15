@@ -1,6 +1,8 @@
 import { Router } from "express";
+import { isAddress } from "viem";
 import TradeRequest from "../models/TradeRequest.js";
 import { attemptMatches } from "../services/matchingService.js";
+import { getContractBuyerAddress } from "../services/contractService.js";
 
 const router = Router();
 
@@ -19,8 +21,18 @@ router.post("/", async (request, response, next) => {
     if (!buyerId || !Number.isFinite(kWhNeeded) || !Number.isFinite(maxPricePerKWh)) {
       return response.status(400).json({ error: "buyerId, kWhNeeded, and maxPricePerKWh are required" });
     }
-    if (kWhNeeded <= 0 || maxPricePerKWh < 0) {
-      return response.status(400).json({ error: "requested amount must be positive and maximum price cannot be negative" });
+    if (!Number.isSafeInteger(kWhNeeded) || kWhNeeded < 1 || maxPricePerKWh <= 0) {
+      return response.status(400).json({ error: "requested amount must be a positive whole kWh and maximum price must be positive" });
+    }
+    if (!isAddress(buyerId)) {
+      return response.status(400).json({ error: "buyerId must be the configured on-chain buyer wallet address" });
+    }
+    const configuredBuyer = getContractBuyerAddress();
+    if (!configuredBuyer) {
+      return response.status(503).json({ error: "BUYER_PRIVATE_KEY is required for backend-assisted matching" });
+    }
+    if (configuredBuyer.toLowerCase() !== buyerId.toLowerCase()) {
+      return response.status(403).json({ error: "buyerId must match the wallet controlled by BUYER_PRIVATE_KEY" });
     }
     const tradeRequest = await TradeRequest.create({ buyerId, kWhNeeded, maxPricePerKWh });
     // Run matching in the background — on-chain settlement takes ~40s per match

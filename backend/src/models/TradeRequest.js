@@ -6,7 +6,7 @@ const fillSchema = new mongoose.Schema(
     sellerId: { type: String, required: true },
     kWh: { type: Number, required: true, min: 0 },
     pricePerKWh: { type: Number, required: true, min: 0 },
-    status: { type: String, enum: ["pending", "purchased", "settled", "failed"], default: "pending" },
+    status: { type: String, enum: ["pending", "purchased", "awaiting_seller", "settled", "failed"], default: "pending" },
     txHash: { type: String },
     purchaseTxHash: { type: String },
     onChainTradeId: { type: Number },

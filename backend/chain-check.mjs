@@ -41,29 +41,52 @@ console.log(`Seller ${sellerAccount.address.slice(0,10)}... role=${sellerP[0]} r
 // 4. Balances
 const buyerBal = await client.getBalance({ address: buyerAccount.address });
 const sellerBal = await client.getBalance({ address: sellerAccount.address });
-console.log(`Buyer balance: ${(Number(buyerBal)/1e18).toFixed(6)} ETH`);
+console.log(`Buyer balance: ${(Number(buyerBal)/1e18).toFixed(6)} ETH (${buyerBal} wei)`);
 console.log(`Seller balance: ${(Number(sellerBal)/1e18).toFixed(6)} ETH`);
 
 // 5. Full round trip: create offer → purchase → settle
-console.log("\n--- Round Trip ---");
+// Use tiny price (1000 wei/kWh) to work with low test-wallet balances
+const PRICE_PER_KWH = 1000n; // 1000 wei per kWh — affordable on testnet
+const KWH_OFFER = 5n;
+const KWH_BUY = 2n;
+const totalValue = KWH_BUY * PRICE_PER_KWH;
+
+console.log(`\n--- Round Trip (price=${PRICE_PER_KWH} wei/kWh) ---`);
+
+// Budget check
+if (buyerBal < totalValue + 100000n * 30000000000n) {
+  console.error(`✗ Buyer has ${buyerBal} wei — may be too low for purchase+gas. Trying anyway...`);
+}
+
+// Register if needed
+async function ensureRegistered(wallet, publicClient, address, role) {
+  const p = await publicClient.readContract({ address: contractAddress, abi: solarShareAbi, functionName: "participants", args: [address] });
+  if (p[1] && (Number(p[0]) === role || Number(p[0]) === 3)) return;
+  const hash = await wallet.writeContract({ address: contractAddress, abi: solarShareAbi, functionName: "registerParticipant", args: [role] });
+  const receipt = await publicClient.waitForTransactionReceipt({ hash });
+  if (receipt.status !== "success") throw new Error(`Registration failed for role ${role}`);
+  console.log(`  Registered ${address.slice(0,10)}... as role ${role}`);
+}
+
+await ensureRegistered(sellerWallet, client, sellerAccount.address, 1);
+await ensureRegistered(buyerWallet, client, buyerAccount.address, 2);
 
 // Create offer
 const createHash = await sellerWallet.writeContract({
   address: contractAddress,
   abi: solarShareAbi,
   functionName: "createOffer",
-  args: [10n, parseEther("0.000525")]
+  args: [KWH_OFFER, PRICE_PER_KWH]
 });
 const createReceipt = await client.waitForTransactionReceipt({ hash: createHash });
 if (createReceipt.status !== "success") throw new Error("createOffer failed");
 
-// Extract offerId from event - use topics directly for indexed params
 const offerCreatedLog = createReceipt.logs.find(
   l => l.address.toLowerCase() === contractAddress.toLowerCase() && l.topics.length === 3
 );
 if (!offerCreatedLog) throw new Error("OfferCreated event not found in receipt");
 const offerId = BigInt(offerCreatedLog.topics[1]);
-console.log(`1. createOffer: offerId=${offerId} kWh=10 price=0.000525 ETH`);
+console.log(`1. createOffer: offerId=${offerId} kWh=${KWH_OFFER} price=${PRICE_PER_KWH} wei/kWh`);
 console.log(`   tx: ${createHash}`);
 console.log(`   ${ETHERSCAN}/${createHash}`);
 
@@ -72,8 +95,8 @@ const purchaseHash = await buyerWallet.writeContract({
   address: contractAddress,
   abi: solarShareAbi,
   functionName: "purchaseEnergy",
-  args: [offerId, 3n],
-  value: parseEther("0.001575")
+  args: [offerId, KWH_BUY],
+  value: totalValue
 });
 const purchaseReceipt = await client.waitForTransactionReceipt({ hash: purchaseHash });
 if (purchaseReceipt.status !== "success") throw new Error("purchaseEnergy failed");
@@ -83,7 +106,7 @@ const tradePurchasedLog = purchaseReceipt.logs.find(
 );
 if (!tradePurchasedLog) throw new Error("TradePurchased event not found in receipt");
 const tradeId = BigInt(tradePurchasedLog.topics[1]);
-console.log(`2. purchaseEnergy: tradeId=${tradeId} kWh=3 value=0.001575 ETH`);
+console.log(`2. purchaseEnergy: tradeId=${tradeId} kWh=${KWH_BUY} value=${totalValue} wei`);
 console.log(`   tx: ${purchaseHash}`);
 console.log(`   ${ETHERSCAN}/${purchaseHash}`);
 

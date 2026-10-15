@@ -1,4 +1,4 @@
-import { createPublicClient, createWalletClient, custom, decodeEventLog, http, parseAbi, parseEther } from "viem";
+import { createPublicClient, createWalletClient, custom, decodeEventLog, http, parseAbi, parseUnits } from "viem";
 import { sepolia } from "viem/chains";
 
 export const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
@@ -27,10 +27,9 @@ export function kWhToContractUnits(kWh) {
 }
 
 export function priceToWei(pricePerKWh) {
-  if (!Number.isFinite(Number(pricePerKWh)) || Number(pricePerKWh) <= 0) throw new Error("On-chain price must be positive");
-  // Scale INR unit rate (e.g. ₹5.25) to 0.0001 ETH/unit for testnet affordability
-  const ethRate = Math.max(0.0001, Number((Number(pricePerKWh) * 0.0001).toFixed(6)));
-  return parseEther(String(ethRate));
+  const rate = String(pricePerKWh).trim();
+  if (!/^\d+(\.\d+)?$/.test(rate) || Number(rate) <= 0) throw new Error("On-chain price must be positive");
+  return parseUnits(rate, 10);
 }
 
 export function getWalletClient(account) {
@@ -41,6 +40,12 @@ export function getWalletClient(account) {
 export function getPublicClient() {
   const transport = window.ethereum ? custom(window.ethereum) : http(import.meta.env.VITE_SEPOLIA_RPC_URL);
   return createPublicClient({ chain: sepolia, transport });
+}
+
+export async function ensureSepoliaNetwork() {
+  if (!window.ethereum) throw new Error("MetaMask was not found");
+  const chainId = await window.ethereum.request({ method: "eth_chainId" });
+  if (Number(chainId) !== sepolia.id) throw new Error("Switch MetaMask to the Sepolia network");
 }
 
 export async function ensureProsumer(account) {

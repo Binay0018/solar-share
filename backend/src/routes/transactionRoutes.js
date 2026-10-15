@@ -1,18 +1,35 @@
 import { Router } from "express";
-import { isHash, createPublicClient, http, decodeEventLog } from "viem";
-import { sepolia } from "viem/chains";
+import { formatUnits, isAddress, isHash } from "viem";
 import Transaction from "../models/Transaction.js";
 import EnergyOffer from "../models/EnergyOffer.js";
 import TradeRequest from "../models/TradeRequest.js";
-import { settlePurchasedTrade, getContractSellerAddress } from "../services/contractService.js";
-import { solarShareAbi } from "../services/solarShareAbi.js";
+import { getOnChainTradeDetails, verifyWalletPurchase, verifyWalletSettlement } from "../services/contractService.js";
 
 const router = Router();
 
 router.get("/", async (_request, response, next) => {
   try {
-    // Only return transactions that have been settled (txHash exists and settledAt is set)
-    return response.json(await Transaction.find({ txHash: { $regex: /^0x/ }, settledAt: { $ne: null } }).sort({ settledAt: -1, createdAt: -1 }).limit(100));
+    const records = await Transaction.find({
+      purchaseTxHash: { $regex: /^0x/ },
+      onChainTradeId: { $exists: true, $ne: null }
+    }).sort({ settledAt: -1, createdAt: -1 }).limit(100).lean();
+    const transactions = await Promise.all(records.map(async (record) => {
+      if (record.sellerId && record.buyerId && record.totalPriceWei) {
+        return { ...record, chainStatus: record.settledAt ? "settled" : "pending" };
+      }
+      const chainTrade = await getOnChainTradeDetails(record.onChainTradeId);
+      await Transaction.updateOne(
+        { _id: record._id },
+        { $set: {
+          sellerId: chainTrade.sellerId,
+          buyerId: chainTrade.buyerId,
+          totalPriceWei: chainTrade.totalPriceWei,
+          kWhTraded: chainTrade.kWhTraded
+        } }
+      );
+      return { ...record, ...chainTrade, chainStatus: chainTrade.status };
+    }));
+    return response.json(transactions);
   } catch (error) {
     return next(error);
   }
@@ -20,29 +37,64 @@ router.get("/", async (_request, response, next) => {
 
 router.post("/confirm-purchase", async (request, response, next) => {
   try {
-    const { offerId, requestId, buyerId, purchaseTxHash } = request.body;
-    const [offer, tradeRequest] = await Promise.all([EnergyOffer.findById(offerId), TradeRequest.findById(requestId)]);
-    if (!offer || !tradeRequest) return response.status(404).json({ error: "offer or trade request not found" });
-    if (tradeRequest.buyerId.toLowerCase() !== String(buyerId).toLowerCase()) return response.status(403).json({ error: "buyer does not match the trade request" });
-    if (offer.status !== "open" || tradeRequest.status !== "open") return response.status(409).json({ error: "offer or request is no longer open" });
-
-    // Idempotency: check if this purchase was already confirmed
-    const existingTx = await Transaction.findOne({ purchaseTxHash });
-    if (existingTx) {
-      return response.json({ transaction: existingTx, idempotent: true });
+    const { offerId, buyerId, purchaseTxHash } = request.body;
+    if (!isAddress(buyerId) || !isHash(purchaseTxHash)) {
+      return response.status(400).json({ error: "buyerId must be a wallet address and purchaseTxHash must be a transaction hash" });
     }
 
-    const settlement = await settlePurchasedTrade({ offer, buyerId, purchaseTxHash });
-    const kWhTraded = Number(settlement.kWhTraded ?? Math.min(offer.kWhAvailable, tradeRequest.kWhNeeded));
-    const totalPrice = Number((kWhTraded * offer.pricePerKWh).toFixed(2));
-    offer.kWhAvailable = Number((offer.kWhAvailable - kWhTraded).toFixed(3));
-    offer.status = offer.kWhAvailable > 0.001 ? "open" : "settled";
-    tradeRequest.kWhNeeded = Number((tradeRequest.kWhNeeded - kWhTraded).toFixed(3));
-    tradeRequest.status = tradeRequest.kWhNeeded > 0.001 ? "open" : "settled";
-    await Promise.all([offer.save(), tradeRequest.save()]);
-    const transaction = await Transaction.create({ offerId, requestId, kWhTraded, totalPrice, ...settlement, settledAt: new Date() });
+    const existingTx = await Transaction.findOne({ purchaseTxHash });
+    if (existingTx) return response.json({ transaction: existingTx, idempotent: true });
+
+    const offer = await EnergyOffer.findById(offerId);
+    if (!offer) return response.status(404).json({ error: "offer not found" });
+    if (!Number.isSafeInteger(offer.onChainOfferId) || !isAddress(offer.sellerId)) {
+      return response.status(400).json({ error: "offer is not linked to an on-chain seller and offer ID" });
+    }
+
+    const purchase = await verifyWalletPurchase({ offer, buyerId, purchaseTxHash });
+    const pricePerKWh = Number(formatUnits(purchase.pricePerKWhWei, 10));
+    const totalPrice = Number(formatUnits(BigInt(purchase.totalPriceWei), 10));
+    const tradeRequest = await TradeRequest.create({
+      buyerId,
+      kWhNeeded: 0,
+      maxPricePerKWh: pricePerKWh,
+      status: "filled",
+      fills: [{
+        offerId: offer._id,
+        sellerId: purchase.sellerId,
+        kWh: purchase.kWhTraded,
+        pricePerKWh,
+        status: "purchased",
+        purchaseTxHash,
+        onChainTradeId: purchase.tradeId
+      }]
+    });
+
+    offer.kWhAvailable = purchase.availableKWh;
+    offer.pricePerKWh = pricePerKWh;
+    offer.status = purchase.availableKWh > 0 ? "open" : "settled";
+    await offer.save();
+
+    const transaction = await Transaction.create({
+      offerId: offer._id,
+      requestId: tradeRequest._id,
+      sellerId: purchase.sellerId,
+      buyerId: purchase.buyerId,
+      kWhTraded: purchase.kWhTraded,
+      totalPrice,
+      totalPriceWei: purchase.totalPriceWei,
+      purchaseTxHash,
+      onChainTradeId: purchase.tradeId,
+      purchaseGasUsed: purchase.purchaseGasUsed,
+      purchaseGasPrice: purchase.purchaseGasPrice,
+      settledAt: null
+    });
     return response.status(201).json({ transaction });
   } catch (error) {
+    if (error.code === 11000 && request.body.purchaseTxHash) {
+      const existingTx = await Transaction.findOne({ purchaseTxHash: request.body.purchaseTxHash });
+      if (existingTx) return response.json({ transaction: existingTx, idempotent: true });
+    }
     return next(error);
   }
 });
@@ -50,55 +102,28 @@ router.post("/confirm-purchase", async (request, response, next) => {
 router.post("/confirm-settlement", async (request, response, next) => {
   try {
     const { txHash, onChainTradeId } = request.body;
-    if (!isHash(txHash) || !Number.isInteger(onChainTradeId)) {
-      return response.status(400).json({ error: "txHash and onChainTradeId are required" });
+    if (!isHash(txHash) || !Number.isSafeInteger(onChainTradeId) || onChainTradeId < 0) {
+      return response.status(400).json({ error: "txHash and a non-negative onChainTradeId are required" });
     }
 
-    // Find the transaction record
     const transaction = await Transaction.findOne({ onChainTradeId });
-    if (!transaction) {
-      return response.status(404).json({ error: "transaction not found" });
-    }
+    if (!transaction) return response.status(404).json({ error: "pending transaction not found" });
     if (transaction.txHash) {
+      if (transaction.txHash !== txHash) return response.status(409).json({ error: "trade was already settled by a different transaction" });
       return response.json({ transaction, idempotent: true });
     }
 
-    // Verify the settlement actually happened on-chain
-    const { CONTRACT_ADDRESS, SEPOLIA_RPC_URL } = process.env;
-    if (!CONTRACT_ADDRESS || !SEPOLIA_RPC_URL) {
-      return response.status(500).json({ error: "contract configuration missing" });
-    }
-
-    const publicClient = createPublicClient({ chain: sepolia, transport: http(SEPOLIA_RPC_URL) });
-    const receipt = await publicClient.getTransactionReceipt({ hash: txHash });
-    if (!receipt) {
-      return response.status(404).json({ error: "transaction receipt not found on-chain" });
-    }
-    if (receipt.status !== "success") {
-      return response.status(400).json({ error: "transaction was not successful on-chain" });
-    }
-
-    // Verify the receipt contains a TradeSettled event for this trade
-    const settledLog = receipt.logs.find(
-      (log) => log.address.toLowerCase() === CONTRACT_ADDRESS.toLowerCase()
-    );
-    if (!settledLog) {
-      return response.status(400).json({ error: "no contract event found in receipt" });
-    }
-
-    // Decode and verify the event is TradeSettled for the correct trade ID
-    const decoded = decodeEventLog({ abi: solarShareAbi, data: settledLog.data, topics: settledLog.topics });
-    if (decoded.eventName !== "TradeSettled") {
-      return response.status(400).json({ error: "transaction did not settle a trade" });
-    }
-    if (decoded.args.tradeId !== BigInt(onChainTradeId)) {
-      return response.status(400).json({ error: "settlement trade ID does not match" });
-    }
-
-    // Update the transaction record
-    transaction.txHash = txHash;
+    const settlement = await verifyWalletSettlement({ transaction, txHash });
+    transaction.txHash = settlement.txHash;
+    transaction.settlementGasUsed = settlement.gasUsed;
+    transaction.settlementGasPrice = settlement.effectiveGasPrice;
     transaction.settledAt = new Date();
     await transaction.save();
+
+    await TradeRequest.updateOne(
+      { _id: transaction.requestId, "fills.onChainTradeId": onChainTradeId },
+      { $set: { "fills.$.status": "settled", "fills.$.txHash": txHash } }
+    );
 
     return response.json({ transaction });
   } catch (error) {

@@ -25,12 +25,24 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/health", (_request, response) => {
+  const databaseState = mongoose.connection.readyState;
   response.json({
     service: "solarshare-backend",
     status: "ok",
-    database: mongoose.connection.readyState === 1 ? "connected" : "disconnected"
+    database: databaseState === 1 ? "connected" : databaseState === 2 ? "connecting" : "disconnected"
   });
 });
+
+app.use(
+  ["/meter-readings", "/offers", "/trades", "/transactions", "/activity", "/metrics"],
+  (_request, response, next) => {
+    if (mongoose.connection.readyState === 1) return next();
+    return response.status(503).json({
+      error: "Database is not connected yet; retry this request when the database is ready",
+      database: mongoose.connection.readyState === 2 ? "connecting" : "disconnected"
+    });
+  }
+);
 
 app.use("/meter-readings", meterReadingRoutes);
 app.use("/offers", offerRoutes);

@@ -1,0 +1,17 @@
+[
+  {
+    "category": "Project update",
+    "title": "SolarShare runs on Sepolia",
+    "text": "Offer creation, energy purchases, and seller settlement are recorded on the Sepolia test network."
+  },
+  {
+    "category": "How it works",
+    "title": "Escrow is released by the seller",
+    "text": "A buyer's payment remains in the contract until the seller signs the settlement transaction."
+  },
+  {
+    "category": "Demo note",
+    "title": "Check the transaction links",
+    "text": "Offer, purchase, and settlement transactions can be inspected on Sepolia Etherscan."
+  }
+]

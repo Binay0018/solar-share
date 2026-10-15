@@ -4,7 +4,7 @@ import MeterReading from "../models/MeterReading.js";
 import { attemptMatches } from "../services/matchingService.js";
 
 const router = Router();
-const defaultPricePerKWh = Number(process.env.DEFAULT_OFFER_PRICE_WEI ?? 1);
+const defaultPricePerKWh = Number(process.env.DEFAULT_OFFER_PRICE);
 
 router.post("/", async (request, response, next) => {
   try {
@@ -14,6 +14,9 @@ router.post("/", async (request, response, next) => {
     }
     if (generationKWh < 0 || consumptionKWh < 0) {
       return response.status(400).json({ error: "generationKWh and consumptionKWh cannot be negative" });
+    }
+    if (!Number.isFinite(defaultPricePerKWh) || defaultPricePerKWh <= 0) {
+      return response.status(503).json({ error: "DEFAULT_OFFER_PRICE is not configured on the backend" });
     }
 
     const surplusKWh = Number((generationKWh - consumptionKWh).toFixed(3));
