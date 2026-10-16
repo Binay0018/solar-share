@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { contractAddress, ensureSepoliaNetwork, getPublicClient, solarShareAbi, writeContractWithGas } from "./contractClient.js";
 import { userErrorMessage } from "./FlowComponents.jsx";
+import { normalizeAddress } from "./purchaseQueue.js";
 
 export default function SettleButton({ trade, wallet, onComplete, onSettled }) {
   const [loading, setLoading] = useState(false);
+  // A purchase is settled only once a settlement receipt is recorded or the chain
+  // reports the trade settled. A confirmed purchase transaction is not a settlement.
+  const settled = Boolean(trade?.settledAt) || trade?.chainStatus === "settled";
+  const hasTradeId = Number.isSafeInteger(trade?.onChainTradeId);
 
   async function settle() {
     if (loading) return;
@@ -11,8 +16,14 @@ export default function SettleButton({ trade, wallet, onComplete, onSettled }) {
       onComplete?.("❌ Connect MetaMask wallet to settle this trade");
       return;
     }
-    if (trade.sellerId?.toLowerCase() !== wallet.toLowerCase()) {
+    // Enforced here as well as in the Sell page: only the seller of this trade,
+    // signing with their own MetaMask wallet, can reach settleTrade.
+    if (!trade || normalizeAddress(trade.sellerId) !== normalizeAddress(wallet)) {
       onComplete?.("❌ Only the seller can settle this trade");
+      return;
+    }
+    if (!hasTradeId) {
+      onComplete?.("❌ This purchase has no on-chain trade ID to settle");
       return;
     }
     setLoading(true);
@@ -54,11 +65,11 @@ export default function SettleButton({ trade, wallet, onComplete, onSettled }) {
     <button
       className="flow-primary"
       onClick={settle}
-      disabled={loading || trade.status === "settled"}
-      style={{ opacity: loading ? 0.7 : 1, fontWeight: "600", cursor: loading ? "not-allowed" : "pointer" }}
-      title="Settle this trade on the blockchain"
+      disabled={loading || settled || !hasTradeId}
+      style={{ opacity: loading ? 0.7 : 1, fontWeight: "600", cursor: loading || settled || !hasTradeId ? "not-allowed" : "pointer" }}
+      title={hasTradeId ? "Settle this trade on the blockchain" : "This purchase has no on-chain trade ID"}
     >
-      {loading ? "Settling..." : trade.status === "settled" ? "Settled" : "Settle"}
+      {loading ? "Settling..." : settled ? "Settled" : "Settle"}
     </button>
   );
 }

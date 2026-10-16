@@ -15,6 +15,13 @@ import {
 import PurchaseButton from "./PurchaseButton.jsx";
 import SettleButton from "./SettleButton.jsx";
 import {
+  canSettlePurchase,
+  selectBuyerEscrowed,
+  selectDirectPurchases,
+  selectSellerPendingPurchases,
+  selectSellerSettledPurchases
+} from "./purchaseQueue.js";
+import {
   AddressTag,
   BarChart,
   EmptyState,
@@ -31,8 +38,14 @@ import {
   userErrorMessage
 } from "./FlowComponents.jsx";
 import announcements from "./announcements.json";
+import { demoMeterReadings } from "./mock/demoMeterData.js";
 
 const apiUrl = import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+
+// Dashboard demo fallback for the "Generation vs consumption" card. On by
+// default; set VITE_USE_DEMO_METER_DATA=false in .env to show the empty state
+// again. The live /meter-readings call is untouched — real readings always win.
+const USE_DEMO_METER_DATA = import.meta.env.VITE_USE_DEMO_METER_DATA !== "false";
 const apiRequest = async (path, options) => {
   const response = await fetch(`${apiUrl}${path}`, { headers: { "content-type": "application/json" }, ...options });
   const result = await response.json().catch(() => ({}));
@@ -102,8 +115,13 @@ export function HomePage({ wallet, metrics, offers, trades, transactions, readin
   const rates = openOffers.map((offer) => Number(offer.pricePerKWh) || 0);
 
   const todaysReadings = readings.filter((reading) => isToday(reading.timestamp));
-  const generationToday = sum(todaysReadings, (reading) => reading.generationKWh);
-  const consumptionToday = sum(todaysReadings, (reading) => reading.consumptionKWh);
+  // Demo fallback: live readings always take priority; the hard-coded series is
+  // only used when the API returned nothing for today and the flag is enabled.
+  const demoActive = USE_DEMO_METER_DATA && todaysReadings.length === 0;
+  const displayReadings = demoActive ? demoMeterReadings() : todaysReadings;
+  const generationToday = sum(displayReadings, (reading) => reading.generationKWh);
+  const consumptionToday = sum(displayReadings, (reading) => reading.consumptionKWh);
+  const surplusToday = generationToday - consumptionToday;
 
   const activity = useMemo(() => {
     const days = Array.from({ length: 7 }, (_, index) => {
@@ -206,14 +224,19 @@ export function HomePage({ wallet, metrics, offers, trades, transactions, readin
             )}
           </Panel>
 
-          <Panel eyebrow="GRID SIGNAL · TODAY" title="Generation vs consumption">
-            {todaysReadings.length ? (
+          <Panel
+            eyebrow="GRID SIGNAL · TODAY"
+            title="Generation vs consumption"
+            actions={demoActive ? <span className="flow-status">Demo data</span> : null}
+          >
+            {displayReadings.length ? (
               <>
                 <div className="flow-list">
-                  <div className="flow-fill-row"><div><p>Generation recorded</p></div><strong>{generationToday.toFixed(2)} kWh</strong></div>
-                  <div className="flow-fill-row"><div><p>Consumption recorded</p></div><strong>{consumptionToday.toFixed(2)} kWh</strong></div>
+                  <div className="flow-fill-row"><div><p>Total generated</p></div><strong>{generationToday.toFixed(2)} kWh</strong></div>
+                  <div className="flow-fill-row"><div><p>Total consumed</p></div><strong>{consumptionToday.toFixed(2)} kWh</strong></div>
+                  <div className="flow-fill-row"><div><p>Surplus available to sell</p></div><strong>{surplusToday.toFixed(2)} kWh</strong></div>
                 </div>
-                <TrendChart readings={todaysReadings} />
+                <TrendChart readings={displayReadings} />
               </>
             ) : (
               <EmptyState icon="⌁" title="No meter readings today" detail="Readings appear when they are recorded against a participant wallet." />
@@ -355,9 +378,11 @@ export function SellPage({ wallet, role, offers, readings, transactions, loading
   const [offerHashes, setOfferHashes] = useState({});
   const [error, setError] = useState("");
   const mine = wallet ? offers.filter((offer) => offer.sellerId?.toLowerCase() === wallet.toLowerCase()) : [];
-  const sellerTransactions = wallet ? transactions.filter((transaction) => transaction.sellerId?.toLowerCase() === wallet.toLowerCase()) : [];
-  const settled = sellerTransactions.filter((transaction) => transaction.settledAt);
-  const incoming = sellerTransactions.filter((transaction) => !transaction.settledAt && transaction.chainStatus !== "settled");
+  // A confirmed purchase transaction is not a settlement: it stays in the pending
+  // queue until a settlement receipt is recorded (or the chain reports the trade
+  // settled). Addresses are compared without letter casing.
+  const settled = selectSellerSettledPurchases(transactions, wallet);
+  const incoming = selectSellerPendingPurchases(transactions, wallet);
   const dailyReadings = readings.filter((reading) => wallet && reading.userId?.toLowerCase() === wallet.toLowerCase() && isToday(reading.timestamp));
   const generation = sum(dailyReadings, (reading) => reading.generationKWh);
   const consumption = sum(dailyReadings, (reading) => reading.consumptionKWh);
@@ -496,7 +521,11 @@ export function SellPage({ wallet, role, offers, readings, transactions, loading
                   <p>Buyer <AddressTag address={transaction.buyerId} /> · Trade #{transaction.onChainTradeId}</p>
                   <TxLink hash={transaction.purchaseTxHash} label="Purchase" />
                 </div>
-                <SettleButton trade={transaction} wallet={wallet} onComplete={onNotice} onSettled={onRefresh} />
+                {canSettlePurchase(transaction, wallet) ? (
+                  <SettleButton trade={transaction} wallet={wallet} onComplete={onNotice} onSettled={onRefresh} />
+                ) : (
+                  <span className="flow-muted">No on-chain trade ID — nothing can be settled for this purchase.</span>
+                )}
               </div>
             ))}
           </div>
@@ -531,8 +560,10 @@ export function BuyPage({ wallet, role, offers, trades, transactions, loading, o
   const requests = wallet ? trades.filter((trade) => trade.buyerId?.toLowerCase() === wallet.toLowerCase()) : [];
   const buyerTransactions = wallet ? transactions.filter((transaction) => transaction.buyerId?.toLowerCase() === wallet.toLowerCase()) : [];
   const purchased = buyerTransactions.filter((transaction) => transaction.settledAt);
-  const directPurchases = buyerTransactions.filter((transaction) => !transaction.requestId);
-  const escrowed = buyerTransactions.filter((transaction) => !transaction.settledAt);
+  // A buyer-signed purchase ("Buy on chain") is linked to a request too, so the
+  // backend record — not the presence of a requestId — decides what belongs here.
+  const directPurchases = selectDirectPurchases(transactions, trades, wallet);
+  const escrowed = selectBuyerEscrowed(transactions, wallet);
   const purchasedKWh = sum(purchased, (transaction) => transaction.kWhTraded);
   const spent = sum(purchased, (transaction) => transaction.totalPrice);
 
