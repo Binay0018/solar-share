@@ -2,9 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  ZERO_ADDRESS,
   canSettlePurchase,
   isDirectPurchase,
   normalizeAddress,
+  normalizeChainTrade,
   selectBuyerEscrowed,
   selectDirectPurchases,
   selectSellerPendingPurchases,
@@ -228,4 +230,64 @@ test("a matched fill is not mistaken for a direct purchase (live-data regression
     const actual = isDirectPurchase({ requestId, onChainTradeId: tradeId }, new Map([[requestId, request]]));
     assert.equal(actual, expected, `trade ${tradeId} direct purchase should be ${expected}`);
   }
+});
+
+/* ---------------------------------------------------------------------------
+   On-chain trade state (`trades(id)`), used by the Settle control so a seller is
+   never offered a settlement the contract must reject.
+   --------------------------------------------------------------------------- */
+
+function chainTradeTuple(tradeId, status, overrides = {}) {
+  return [
+    BigInt(tradeId), BigInt(10), overrides.seller ?? SELLER, overrides.buyer ?? BUYER,
+    BigInt(overrides.kWhTraded ?? 4), BigInt(overrides.totalPriceWei ?? 28n), status
+  ];
+}
+
+test("11. the contract's trade status is read exactly: 1 means settled, 0 means pending", () => {
+  const settled = normalizeChainTrade(chainTradeTuple(57, 1));
+  assert.equal(settled.exists, true);
+  assert.equal(settled.settledOnChain, true);
+  assert.equal(settled.id, 57);
+  assert.equal(settled.offerId, 10);
+  assert.equal(settled.kWhTraded, 4);
+  assert.equal(settled.seller, SELLER);
+
+  const pending = normalizeChainTrade(chainTradeTuple(55, 0));
+  assert.equal(pending.exists, true);
+  assert.equal(pending.settledOnChain, false);
+  // A bigint status (as some RPC decoders return) is handled too.
+  assert.equal(normalizeChainTrade(chainTradeTuple(55, 1n)).settledOnChain, true);
+});
+
+test("12. a trade the contract does not know is never reported as settled", () => {
+  const zeroes = [0n, 0n, ZERO_ADDRESS, ZERO_ADDRESS, 0n, 0n, 0n];
+  const missing = normalizeChainTrade(zeroes);
+  assert.equal(missing.exists, false);
+  assert.equal(missing.settledOnChain, false);
+  // Missing data must not be turned into a settled state either.
+  assert.equal(normalizeChainTrade(undefined).settledOnChain, false);
+  assert.equal(normalizeChainTrade([]).exists, false);
+});
+
+test("13. live Sepolia regression: the six trades settled on-chain while the ledger still says pending", () => {
+  // `eth_call trades(id)` on 0xd5332E490e251813702bf461CAfED84FF3d0319C returned
+  // status 1 (Settled) for these ids and status 0 for the ids below.
+  const settledOnChain = [33, 35, 52, 53, 58, 59];
+  const stillPending = [29, 30, 31, 37, 38, 39, 42, 44, 45, 46, 48, 51, 54, 55];
+  for (const id of settledOnChain) {
+    assert.equal(normalizeChainTrade(chainTradeTuple(id, 1)).settledOnChain, true, `trade ${id} is settled on-chain`);
+  }
+  for (const id of stillPending) {
+    assert.equal(normalizeChainTrade(chainTradeTuple(id, 0)).settledOnChain, false, `trade ${id} is still pending on-chain`);
+  }
+});
+
+test("14. the seller on the chain trade is compared with case-insensitive addresses", () => {
+  const lower = normalizeChainTrade(chainTradeTuple(57, 1, { seller: SELLER_LOWER }));
+  assert.equal(normalizeChainTrade(chainTradeTuple(57, 1, { seller: SELLER_LOWER })).seller, SELLER_LOWER);
+  assert.equal(normalizeAddress(lower.seller), SELLER_LOWER);
+  // Only the row's own seller may treat a chain-settled trade as settled.
+  assert.equal(normalizeAddress(lower.seller) === normalizeAddress(SELLER), true);
+  assert.equal(normalizeAddress(lower.seller) === normalizeAddress(OTHER), false);
 });

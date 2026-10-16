@@ -80,6 +80,36 @@ export function canSettlePurchase(transaction, wallet) {
   );
 }
 
+/* ---------------------------------------------------------------------------
+   On-chain trade state.
+
+   `trades(id)` returns a tuple. The contract stores nothing for a trade that was
+   never bought and reports it as all zeroes; it also treats `seller == address(0)`
+   as "no such trade" (settleTrade reverts OfferUnavailable in that case), so the
+   same rule is applied here. This only interprets what the chain returned — a
+   trade counts as settled when, and only when, the contract's status says so.
+   --------------------------------------------------------------------------- */
+
+/** The address the contract uses to mean "no trade". */
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+
+/** Normalise the raw `trades(id)` tuple into plain, comparable values. */
+export function normalizeChainTrade(raw) {
+  const [id, offerId, seller, buyer, kWhTraded, totalPriceWei, status] = raw ?? [];
+  const sellerAddress = typeof seller === "string" ? seller.trim() : "";
+  const exists = sellerAddress !== "" && normalizeAddress(sellerAddress) !== ZERO_ADDRESS;
+  return {
+    id: Number(id ?? 0),
+    offerId: Number(offerId ?? 0),
+    seller: sellerAddress,
+    buyer: typeof buyer === "string" ? buyer.trim() : "",
+    kWhTraded: Number(kWhTraded ?? 0),
+    totalPriceWei: totalPriceWei ?? 0n,
+    exists,
+    settledOnChain: exists && Number(status ?? 0) === 1
+  };
+}
+
 /** Index TradeRequest documents by `_id` so a transaction can be traced to its request. */
 export function indexRequests(requests) {
   const byId = new Map();

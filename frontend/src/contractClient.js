@@ -1,5 +1,6 @@
 import { createPublicClient, createWalletClient, custom, decodeEventLog, http, parseAbi, parseUnits } from "viem";
 import { sepolia } from "viem/chains";
+import { normalizeChainTrade } from "./purchaseQueue.js";
 
 export const contractAddress = import.meta.env.VITE_CONTRACT_ADDRESS;
 export const solarShareAbi = parseAbi([
@@ -88,6 +89,23 @@ export async function ensureConsumer(account) {
   const hash = await writeContractWithGas(account, { address: contractAddress, abi: solarShareAbi, functionName: "registerParticipant", args: [2] });
   const receipt = await publicClient.waitForTransactionReceipt({ hash });
   if (receipt.status !== "success") throw new Error("Buyer registration failed");
+}
+
+/**
+ * Read-only view of one trade straight from the contract. The Sell page uses it
+ * to avoid offering a settlement the contract would reject (a trade that is
+ * already settled on-chain reverts with TradeAlreadySettled). It never signs
+ * anything and returns `undefined` when there is nothing to read.
+ */
+export async function readTradeOnChain(tradeId) {
+  if (!contractAddress || !Number.isSafeInteger(tradeId)) return undefined;
+  const raw = await getPublicClient().readContract({
+    address: contractAddress,
+    abi: solarShareAbi,
+    functionName: "trades",
+    args: [BigInt(tradeId)]
+  });
+  return normalizeChainTrade(raw);
 }
 
 export function decodeContractEvent(receipt, eventName) {

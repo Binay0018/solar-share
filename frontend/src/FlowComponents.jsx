@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { revertErrorMessage } from "./revertErrors.js";
 
 /* ---------------------------------------------------------------------------
    Shared presentation components.
@@ -80,6 +81,12 @@ export function Toast({ message, onDismiss, error = false }) {
 }
 
 export function userErrorMessage(error) {
+  // A contract revert (for example the deployed contract's
+  // TradeAlreadySettled, data 0xfd72c0a0) is decoded first so the user is told
+  // what the contract refused, instead of a bare selector or "execution
+  // reverted". Anything that is not a revert falls through to the checks below.
+  const revert = revertErrorMessage(error);
+  if (revert) return revert;
   const message = error?.shortMessage || error?.message || String(error);
   if (/user rejected|user denied|rejected the request|4001/i.test(message)) return "The request was cancelled in MetaMask.";
   if (/switch.*sepolia|chain.?id|wrong network/i.test(message)) return "Switch MetaMask to Sepolia and try again.";
