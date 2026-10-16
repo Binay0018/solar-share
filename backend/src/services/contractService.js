@@ -252,6 +252,31 @@ export async function settleMatchOnChain({ offer, kWhTraded }) {
   };
 }
 
+/**
+ * Proves that a purchase transaction receipt carries the SolarShare contract's
+ * own TradePurchased event for this offer and buyer.
+ *
+ * As with settlements, the transaction target is deliberately not compared with the
+ * contract address: a buyer wallet that MetaMask has upgraded to an EIP-7702 smart
+ * account reaches purchaseEnergy through a delegation or batching contract, so the
+ * outer transaction is addressed elsewhere and an otherwise valid purchase would be
+ * rejected. The purchase is instead proven by the contract's own log: the
+ * TradePurchased event must be emitted by the contract address (enforced by
+ * decodeEventFromReceipt, which ignores every other log address) and must name the
+ * expected offerId and buyer.
+ */
+export function verifyPurchaseReceipt(receipt, contractAddress, { offer, buyerId }) {
+  if (receipt.status !== "success") throw new Error("purchaseEnergy transaction failed");
+  if (receipt.from?.toLowerCase() !== buyerId.toLowerCase()) {
+    throw new Error("purchase transaction buyer does not match");
+  }
+  const purchased = decodeEventFromReceipt(receipt, contractAddress, "TradePurchased");
+  if (purchased.offerId !== BigInt(offer.onChainOfferId) || purchased.buyer.toLowerCase() !== buyerId.toLowerCase()) {
+    throw new Error("purchase receipt does not match this offer and buyer");
+  }
+  return purchased;
+}
+
 export async function verifyWalletPurchase({ offer, buyerId, purchaseTxHash }) {
   const { contractAddress, publicClient } = getPublicChainClient();
   if (!isAddress(buyerId) || !Number.isSafeInteger(offer.onChainOfferId) || !isHash(purchaseTxHash)) {
@@ -260,15 +285,10 @@ export async function verifyWalletPurchase({ offer, buyerId, purchaseTxHash }) {
   if (!isAddress(offer.sellerId)) throw new Error("the marketplace seller must be a wallet address");
 
   const receipt = await publicClient.waitForTransactionReceipt({ hash: purchaseTxHash });
-  if (receipt.status !== "success") throw new Error("purchaseEnergy transaction failed");
-  if (receipt.to?.toLowerCase() !== contractAddress.toLowerCase() || receipt.from.toLowerCase() !== buyerId.toLowerCase()) {
-    throw new Error("purchase transaction contract or buyer does not match");
-  }
-  const transaction = await publicClient.getTransaction({ hash: purchaseTxHash });
-  const purchased = decodeEventFromReceipt(receipt, contractAddress, "TradePurchased");
-  if (purchased.offerId !== BigInt(offer.onChainOfferId) || purchased.buyer.toLowerCase() !== buyerId.toLowerCase()) {
-    throw new Error("purchase receipt does not match this offer and buyer");
-  }
+  // The buyer wallet may be an EIP-7702 smart account, so the purchase transaction
+  // is not required to target the contract directly; the contract's own
+  // TradePurchased log for this offer and buyer is what proves the purchase.
+  const purchased = verifyPurchaseReceipt(receipt, contractAddress, { offer, buyerId });
 
   const [chainOffer, chainTrade] = await Promise.all([
     publicClient.readContract({
@@ -293,7 +313,6 @@ export async function verifyWalletPurchase({ offer, buyerId, purchaseTxHash }) {
     chainTrade[4] !== purchased.kWhTraded ||
     chainTrade[5] !== purchased.totalPrice ||
     Number(chainTrade[6]) !== 0 ||
-    transaction.value !== expectedValue ||
     purchased.totalPrice !== expectedValue
   ) {
     throw new Error("purchase transaction does not match the on-chain offer and pending trade");
@@ -319,6 +338,34 @@ export async function verifyWalletPurchase({ offer, buyerId, purchaseTxHash }) {
   };
 }
 
+/**
+ * Proves that a settlement transaction receipt carries the SolarShare contract's
+ * own TradeSettled event for one stored trade.
+ *
+ * The transaction target is deliberately not compared with the contract address:
+ * a seller wallet that MetaMask has upgraded to an EIP-7702 smart account reaches
+ * settleTrade through a delegation or batching contract, so the outer transaction
+ * is addressed elsewhere and the settlement would otherwise be rejected even
+ * though the contract settled the trade. The settlement is instead proven by the
+ * contract's own log: the TradeSettled event must be emitted by the contract
+ * address (enforced by decodeEventFromReceipt, which ignores every other log
+ * address) and must carry the expected tradeId and seller.
+ */
+export function verifySettlementReceipt(receipt, contractAddress, transaction) {
+  if (receipt.status !== "success") throw new Error("settlement transaction failed");
+  if (receipt.from?.toLowerCase() !== transaction.sellerId.toLowerCase()) {
+    throw new Error("settlement transaction seller does not match");
+  }
+  const settled = decodeEventFromReceipt(receipt, contractAddress, "TradeSettled");
+  if (
+    settled.tradeId !== BigInt(transaction.onChainTradeId) ||
+    settled.seller.toLowerCase() !== transaction.sellerId.toLowerCase()
+  ) {
+    throw new Error("settlement receipt does not contain the expected TradeSettled event");
+  }
+  return settled;
+}
+
 export async function verifyWalletSettlement({ transaction, txHash }) {
   const { contractAddress, publicClient } = getPublicChainClient();
   if (!Number.isSafeInteger(transaction.onChainTradeId) || !isHash(txHash) || !isAddress(transaction.sellerId)) {
@@ -338,17 +385,10 @@ export async function verifyWalletSettlement({ transaction, txHash }) {
     throw new Error("stored transaction does not match the on-chain trade");
   }
   const receipt = await publicClient.getTransactionReceipt({ hash: txHash });
-  if (receipt.status !== "success") throw new Error("settlement transaction failed");
-  if (receipt.to?.toLowerCase() !== contractAddress.toLowerCase() || receipt.from.toLowerCase() !== transaction.sellerId.toLowerCase()) {
-    throw new Error("settlement transaction contract or seller does not match");
-  }
-  const settled = decodeEventFromReceipt(receipt, contractAddress, "TradeSettled");
-  if (
-    settled.tradeId !== BigInt(transaction.onChainTradeId) ||
-    settled.seller.toLowerCase() !== transaction.sellerId.toLowerCase()
-  ) {
-    throw new Error("settlement receipt does not contain the expected TradeSettled event");
-  }
+  // The seller wallet may be an EIP-7702 smart account, so the settlement
+  // transaction is not required to target the contract directly; the contract's
+  // own TradeSettled log for this trade is what proves the settlement.
+  verifySettlementReceipt(receipt, contractAddress, transaction);
 
   if (
     trade[2].toLowerCase() !== transaction.sellerId.toLowerCase() ||

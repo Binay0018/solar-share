@@ -108,6 +108,76 @@ export async function readTradeOnChain(tradeId) {
   return normalizeChainTrade(raw);
 }
 
+/**
+ * Read several `trades(id)` entries in one pass for a caller's row list.
+ * Read-only: it never signs or sends anything. An id that cannot be read is
+ * simply absent from the result, so an RPC hiccup can never turn a row into a
+ * settled one.
+ */
+export async function readTradesOnChain(tradeIds) {
+  const ids = [...new Set((tradeIds ?? []).filter((tradeId) => Number.isSafeInteger(tradeId)))];
+  const entries = await Promise.all(
+    ids.map(async (tradeId) => [tradeId, await readTradeOnChain(tradeId).catch(() => undefined)])
+  );
+  return Object.fromEntries(entries.filter(([, trade]) => trade !== undefined));
+}
+
+/**
+ * Find the transaction that settled one trade, so the marketplace ledger can be
+ * synchronised without signing anything.
+ *
+ * A trade status only moves Pending -> Settled, so the settlement block is found
+ * by bisecting `trades(id).status` between the purchase block and the head of the
+ * chain (about 20 read-only calls), and the contract's own TradeSettled log is
+ * then read from that single block. Only the contract's event is returned; when
+ * the trade is not settled on-chain, or the event cannot be read, the result is
+ * null rather than a guess.
+ */
+export async function findSettlementTxHash(tradeId, { purchaseTxHash } = {}) {
+  if (!contractAddress || !Number.isSafeInteger(tradeId)) {
+    throw new Error("An on-chain trade ID is required to look up a settlement transaction");
+  }
+  const publicClient = getPublicClient();
+  const isSettledAt = async (blockNumber) => {
+    const raw = await publicClient.readContract({
+      address: contractAddress,
+      abi: solarShareAbi,
+      functionName: "trades",
+      args: [BigInt(tradeId)],
+      blockNumber
+    });
+    return normalizeChainTrade(raw).settledOnChain;
+  };
+
+  const latest = await publicClient.getBlockNumber();
+  let low = 0n;
+  // A settlement can only happen after the purchase, so the purchase block is a
+  // safe lower bound and keeps the search short.
+  if (typeof purchaseTxHash === "string" && purchaseTxHash.length === 66) {
+    const purchase = await publicClient.getTransactionReceipt({ hash: purchaseTxHash }).catch(() => null);
+    if (typeof purchase?.blockNumber === "bigint") low = purchase.blockNumber;
+  }
+  if (low > latest) low = latest;
+  if (!(await isSettledAt(latest))) return null;
+
+  let high = latest;
+  while (low < high) {
+    const mid = low + (high - low) / 2n;
+    if (await isSettledAt(mid)) high = mid;
+    else low = mid + 1n;
+  }
+
+  const logs = await publicClient.getContractEvents({
+    address: contractAddress,
+    abi: solarShareAbi,
+    eventName: "TradeSettled",
+    args: { tradeId: BigInt(tradeId) },
+    fromBlock: low,
+    toBlock: low
+  });
+  return logs[0]?.transactionHash ?? null;
+}
+
 export function decodeContractEvent(receipt, eventName) {
   const logs = receipt.logs.filter((entry) => entry.address.toLowerCase() === contractAddress.toLowerCase());
   if (logs.length === 0) throw new Error(`${eventName} event was not found in the transaction receipt`);

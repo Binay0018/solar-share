@@ -4,9 +4,11 @@ import assert from "node:assert/strict";
 import {
   ZERO_ADDRESS,
   canSettlePurchase,
+  isChainSettledTrade,
   isDirectPurchase,
   normalizeAddress,
   normalizeChainTrade,
+  partitionPendingByChain,
   selectBuyerEscrowed,
   selectDirectPurchases,
   selectSellerPendingPurchases,
@@ -290,4 +292,69 @@ test("14. the seller on the chain trade is compared with case-insensitive addres
   // Only the row's own seller may treat a chain-settled trade as settled.
   assert.equal(normalizeAddress(lower.seller) === normalizeAddress(SELLER), true);
   assert.equal(normalizeAddress(lower.seller) === normalizeAddress(OTHER), false);
+});
+
+/* ---------------------------------------------------------------------------
+   Chain-aware split of the seller's awaiting queue. The contract decides
+   whether a trade is still escrowed, so the escrowed total and the row actions
+   cannot disagree with it.
+   --------------------------------------------------------------------------- */
+
+function chainMap(entries) {
+  return Object.fromEntries(entries.map(([id, status, overrides]) => [id, normalizeChainTrade(chainTradeTuple(id, status, overrides))]));
+}
+
+const escrowedValue = (rows) => rows.reduce((total, row) => total + row.totalPrice, 0);
+
+test("15. a chain-settled trade leaves the awaiting queue and stops counting as escrowed", () => {
+  const rows = [
+    pendingTrade({ _id: "tx-59", onChainTradeId: 59, totalPrice: 8 }),
+    pendingTrade({ _id: "tx-55", onChainTradeId: 55, totalPrice: 14 }),
+    pendingTrade({ _id: "tx-54", onChainTradeId: 54, totalPrice: 28 })
+  ];
+  const { awaiting, awaitingSync } = partitionPendingByChain(rows, chainMap([[59, 1], [55, 0], [54, 0]]));
+
+  assert.deepEqual(awaitingSync.map((row) => row.onChainTradeId), [59], "only the chain-settled trade needs a ledger sync");
+  assert.deepEqual(awaiting.map((row) => row.onChainTradeId), [55, 54]);
+  // The header total is the sum over `awaiting`, so it drops by exactly the value
+  // of the trade the contract already released.
+  assert.equal(escrowedValue(rows), 50);
+  assert.equal(escrowedValue(awaiting), 42);
+  assert.equal(escrowedValue(awaiting), escrowedValue(rows) - 8);
+  assert.equal(awaitingSync.length + awaiting.length, rows.length, "no row is lost in the split");
+});
+
+test("16. only the row's own seller may treat a chain-settled trade as settled", () => {
+  const row = pendingTrade({ onChainTradeId: 59 });
+  assert.equal(isChainSettledTrade(row, chainMap([[59, 1]])), true);
+  assert.equal(isChainSettledTrade(row, chainMap([[59, 1, { seller: OTHER }]])), false, "another seller's trade is not this row's");
+  assert.equal(isChainSettledTrade({ ...row, sellerId: OTHER }, chainMap([[59, 1]])), false);
+  assert.equal(isChainSettledTrade(row, chainMap([[59, 1, { seller: SELLER_LOWER }]])), true, "address casing is irrelevant");
+});
+
+test("17. missing or unreadable chain data never marks an awaiting row as settled", () => {
+  const row = pendingTrade({ onChainTradeId: 59 });
+  assert.equal(isChainSettledTrade(row, {}), false, "a row that was not read stays actionable");
+  assert.equal(isChainSettledTrade(row, undefined), false);
+  assert.equal(isChainSettledTrade(row, chainMap([[59, 0]])), false, "status 0 is still pending");
+  const unknownTrade = normalizeChainTrade([0n, 0n, ZERO_ADDRESS, ZERO_ADDRESS, 0n, 0n, 0n]);
+  assert.equal(isChainSettledTrade(row, { 59: unknownTrade }), false, "a trade the contract does not know is not settled");
+
+  const { awaiting, awaitingSync } = partitionPendingByChain([row], {});
+  assert.equal(awaiting.length, 1);
+  assert.equal(awaitingSync.length, 0);
+});
+
+test("18. live Sepolia regression: the six out-of-sync trades are the ones excluded from escrow", () => {
+  // `eth_call trades(id)` on 0xd5332E490e251813702bf461CAfED84FF3d0319C returned
+  // status 1 (Settled) for the first list and status 0 for the second.
+  const settledOnChain = [33, 35, 52, 53, 58, 59];
+  const stillPending = [29, 30, 31, 37, 38, 39, 42, 44, 45, 46, 48, 51, 54, 55];
+  const rows = [...settledOnChain, ...stillPending].map((id) => pendingTrade({ _id: `tx-${id}`, onChainTradeId: id, totalPrice: 5 }));
+  const chain = chainMap([...settledOnChain.map((id) => [id, 1]), ...stillPending.map((id) => [id, 0])]);
+
+  const { awaiting, awaitingSync } = partitionPendingByChain(rows, chain);
+  const sortIds = (list) => list.map((row) => row.onChainTradeId).sort((a, b) => a - b);
+  assert.deepEqual(sortIds(awaitingSync), [...settledOnChain].sort((a, b) => a - b));
+  assert.deepEqual(sortIds(awaiting), [...stillPending].sort((a, b) => a - b));
 });

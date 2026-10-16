@@ -110,6 +110,39 @@ export function normalizeChainTrade(raw) {
   };
 }
 
+/**
+ * Whether the contract itself reports this stored purchase as settled. Only the
+ * contract decides a settlement: the row counts as settled on-chain when
+ * `trades(id)` exists, its status is Settled, and it still names this row's
+ * seller. Nothing else — no ledger field, no transaction hash — can make a row
+ * look settled.
+ */
+export function isChainSettledTrade(transaction, chainTrades) {
+  const chain = chainTrades?.[transaction?.onChainTradeId];
+  if (!chain?.exists || !chain.settledOnChain) return false;
+  return normalizeAddress(chain.seller) === normalizeAddress(transaction?.sellerId);
+}
+
+/**
+ * Split the seller's awaiting queue with the chain as the tie-breaker:
+ *
+ *  - `awaitingSync` — the contract already settled the trade and released the
+ *    funds, but the marketplace ledger has not recorded that settlement yet.
+ *    The escrow is gone, so these rows must not be counted as escrowed and no
+ *    settlement may be signed for them; only the ledger record is missing.
+ *  - `awaiting` — the trade is still pending on-chain, so the funds really are
+ *    still escrowed and a settlement can still be signed by the seller.
+ */
+export function partitionPendingByChain(pending, chainTrades) {
+  const awaiting = [];
+  const awaitingSync = [];
+  for (const transaction of pending ?? []) {
+    if (isChainSettledTrade(transaction, chainTrades)) awaitingSync.push(transaction);
+    else awaiting.push(transaction);
+  }
+  return { awaiting, awaitingSync };
+}
+
 /** Index TradeRequest documents by `_id` so a transaction can be traced to its request. */
 export function indexRequests(requests) {
   const byId = new Map();

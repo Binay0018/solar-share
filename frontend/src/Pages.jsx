@@ -9,6 +9,7 @@ import {
   getPublicClient,
   kWhToContractUnits,
   priceToWei,
+  readTradesOnChain,
   solarShareAbi,
   writeContractWithGas
 } from "./contractClient.js";
@@ -16,6 +17,8 @@ import PurchaseButton from "./PurchaseButton.jsx";
 import SettleButton from "./SettleButton.jsx";
 import {
   canSettlePurchase,
+  isChainSettledTrade,
+  partitionPendingByChain,
   selectBuyerEscrowed,
   selectDirectPurchases,
   selectSellerPendingPurchases,
@@ -383,12 +386,41 @@ export function SellPage({ wallet, role, offers, readings, transactions, loading
   // settled). Addresses are compared without letter casing.
   const settled = selectSellerSettledPurchases(transactions, wallet);
   const incoming = selectSellerPendingPurchases(transactions, wallet);
+  // The chain, not the ledger, decides whether a settlement can still be signed.
+  // Every awaiting row is read once so that the escrow total and each row's action
+  // agree on which trades the contract already settled.
+  const incomingKey = incoming.map((transaction) => transaction.onChainTradeId ?? "").join(",");
+  const [chainTrades, setChainTrades] = useState({});
+  const [chainReloadKey, setChainReloadKey] = useState(0);
+  useEffect(() => {
+    const tradeIds = incomingKey
+      .split(",")
+      .filter((value) => value !== "")
+      .map(Number)
+      .filter(Number.isSafeInteger);
+    if (!tradeIds.length) return undefined;
+    let active = true;
+    readTradesOnChain(tradeIds)
+      .then((trades) => {
+        if (active) setChainTrades(trades);
+      })
+      .catch(() => {
+        // A read that fails must never hide a legitimate Settle control, so the
+        // previous picture is kept and no row is promoted to settled.
+      });
+    return () => {
+      active = false;
+    };
+  }, [incomingKey, chainReloadKey]);
+  // Trades the contract already settled are no longer escrowed; only their ledger
+  // record is missing, so they must not be counted in the escrowed total.
+  const { awaiting: awaitingSettlement, awaitingSync } = partitionPendingByChain(incoming, chainTrades);
   const dailyReadings = readings.filter((reading) => wallet && reading.userId?.toLowerCase() === wallet.toLowerCase() && isToday(reading.timestamp));
   const generation = sum(dailyReadings, (reading) => reading.generationKWh);
   const consumption = sum(dailyReadings, (reading) => reading.consumptionKWh);
   const surplus = dailyReadings.reduce((total, reading) => total + Math.max(0, Number(reading.surplusKWh || 0)), 0);
   const earned = sum(settled, (transaction) => transaction.totalPrice);
-  const waitingValue = sum(incoming, (transaction) => transaction.totalPrice);
+  const waitingValue = sum(awaitingSettlement, (transaction) => transaction.totalPrice);
 
   async function publish(event) {
     event.preventDefault();
@@ -509,7 +541,16 @@ export function SellPage({ wallet, role, offers, readings, transactions, loading
       <Panel
         eyebrow="INCOMING PURCHASES"
         title="Awaiting seller settlement"
-        actions={incoming.length ? <span className="flow-status flow-status-awaiting_seller">{incoming.length} trade{incoming.length === 1 ? "" : "s"} · {rupees(waitingValue)} escrowed</span> : null}
+        actions={incoming.length ? (
+          <>
+            <span className="flow-status flow-status-awaiting_seller">{awaitingSettlement.length} trade{awaitingSettlement.length === 1 ? "" : "s"} · {rupees(waitingValue)} escrowed</span>
+            {awaitingSync.length ? (
+              <span className="flow-status" title="The blockchain already settled these trades and released the funds, so they are no longer escrowed. Only their marketplace ledger record is missing.">
+                {awaitingSync.length} awaiting ledger sync
+              </span>
+            ) : null}
+          </>
+        ) : null}
       >
         <p className="flow-copy">Only your own MetaMask wallet can sign <code>settleTrade</code> for these purchases. The backend never settles on a seller's behalf.</p>
         {loading ? <Skeleton rows={2} /> : incoming.length ? (
@@ -522,7 +563,15 @@ export function SellPage({ wallet, role, offers, readings, transactions, loading
                   <TxLink hash={transaction.purchaseTxHash} label="Purchase" />
                 </div>
                 {canSettlePurchase(transaction, wallet) ? (
-                  <SettleButton trade={transaction} wallet={wallet} onComplete={onNotice} onSettled={onRefresh} />
+                  <SettleButton
+                    trade={transaction}
+                    wallet={wallet}
+                    chainSettled={isChainSettledTrade(transaction, chainTrades)}
+                    onComplete={onNotice}
+                    onSettled={onRefresh}
+                    onSynced={onRefresh}
+                    onRecheckChain={() => setChainReloadKey((key) => key + 1)}
+                  />
                 ) : (
                   <span className="flow-muted">No on-chain trade ID — nothing can be settled for this purchase.</span>
                 )}
