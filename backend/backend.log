@@ -1,0 +1,3183 @@
+SolarShare backend listening on port 3000
+Connected to MongoDB
+Backend Route Error: MongoNetworkError: read ECONNRESET
+    at Connection.onSocketError (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:110:22)
+    at TLSSocket.emit (node:events:520:35)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+  errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+  beforeHandshake: false,
+  connectionGeneration: 12,
+  [cause]: Error: read ECONNRESET
+      at TLSWrap.onStreamRead (node:internal/stream_base_commons:216:20) {
+    errno: -4077,
+    code: 'ECONNRESET',
+    syscall: 'read'
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async AggregationCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\aggregation_cursor.js:57:26)
+    at async AggregationCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async AggregationCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async AggregationCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: connection <monitor> to 159.41.196.50:27017 closed
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async AggregationCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\aggregation_cursor.js:57:26)
+    at async AggregationCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async AggregationCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async AggregationCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async Collection.countDocuments (D:\solarshare\backend\node_modules\mongodb\lib\collection.js:521:21)
+    at async model.Query.exec (D:\solarshare\backend\node_modules\mongoose\lib\query.js:4622:63)
+    at async file:///D:/solarshare/backend/src/routes/metricsRoutes.js:19:31 {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connection <monitor> to 159.41.196.50:27017 closed
+      at Connection.destroy (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:139:22)
+      at resetMonitorState (D:\solarshare\backend\node_modules\mongodb\lib\sdam\monitor.js:150:25)
+      at Monitor.reset (D:\solarshare\backend\node_modules\mongodb\lib\sdam\monitor.js:106:9)
+      at markServerUnknown (D:\solarshare\backend\node_modules\mongodb\lib\sdam\server.js:356:25)
+      at Server.handleError (D:\solarshare\backend\node_modules\mongodb\lib\sdam\server.js:249:17)
+      at Server.decorateCommandError (D:\solarshare\backend\node_modules\mongodb\lib\sdam\server.js:319:14)
+      at Server.command (D:\solarshare\backend\node_modules\mongodb\lib\sdam\server.js:199:28)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:213:32)
+      at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: undefined
+  }
+}
+Backend Route Error: MongoServerSelectionError: connect ETIMEDOUT 159.41.196.50:27017
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async AggregationCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\aggregation_cursor.js:57:26)
+    at async AggregationCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async AggregationCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async AggregationCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async Collection.countDocuments (D:\solarshare\backend\node_modules\mongodb\lib\collection.js:521:21)
+    at async model.Query.exec (D:\solarshare\backend\node_modules\mongoose\lib\query.js:4622:63)
+    at async file:///D:/solarshare/backend/src/routes/metricsRoutes.js:19:31 {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ETIMEDOUT 159.41.196.50:27017
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: connect ETIMEDOUT 159.41.196.50:27017
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+      errno: -4039,
+      code: 'ETIMEDOUT',
+      syscall: 'connect',
+      address: '159.41.196.50',
+      port: 27017
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: connect ETIMEDOUT 159.41.196.50:27017
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ETIMEDOUT 159.41.196.50:27017
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: connect ETIMEDOUT 159.41.196.50:27017
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+      errno: -4039,
+      code: 'ETIMEDOUT',
+      syscall: 'connect',
+      address: '159.41.196.50',
+      port: 27017
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: connect ETIMEDOUT 159.41.196.50:27017
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ETIMEDOUT 159.41.196.50:27017
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: connect ETIMEDOUT 159.41.196.50:27017
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+      errno: -4039,
+      code: 'ETIMEDOUT',
+      syscall: 'connect',
+      address: '159.41.196.50',
+      port: 27017
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: connect ETIMEDOUT 159.41.196.50:27017
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ETIMEDOUT 159.41.196.50:27017
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: connect ETIMEDOUT 159.41.196.50:27017
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+      errno: -4039,
+      code: 'ETIMEDOUT',
+      syscall: 'connect',
+      address: '159.41.196.50',
+      port: 27017
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: connect ETIMEDOUT 159.41.196.50:27017
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ETIMEDOUT 159.41.196.50:27017
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: connect ETIMEDOUT 159.41.196.50:27017
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+      errno: -4039,
+      code: 'ETIMEDOUT',
+      syscall: 'connect',
+      address: '159.41.196.50',
+      port: 27017
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: connect ETIMEDOUT 159.41.196.50:27017
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ETIMEDOUT 159.41.196.50:27017
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: connect ETIMEDOUT 159.41.196.50:27017
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+      errno: -4039,
+      code: 'ETIMEDOUT',
+      syscall: 'connect',
+      address: '159.41.196.50',
+      port: 27017
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: connect ETIMEDOUT 159.41.196.50:27017
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ETIMEDOUT 159.41.196.50:27017
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: connect ETIMEDOUT 159.41.196.50:27017
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+      errno: -4039,
+      code: 'ETIMEDOUT',
+      syscall: 'connect',
+      address: '159.41.196.50',
+      port: 27017
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: connect ETIMEDOUT 159.41.196.50:27017
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ETIMEDOUT 159.41.196.50:27017
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: connect ETIMEDOUT 159.41.196.50:27017
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+      errno: -4039,
+      code: 'ETIMEDOUT',
+      syscall: 'connect',
+      address: '159.41.196.50',
+      port: 27017
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: connect ETIMEDOUT 159.41.196.50:27017
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ETIMEDOUT 159.41.196.50:27017
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: connect ETIMEDOUT 159.41.196.50:27017
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+      errno: -4039,
+      code: 'ETIMEDOUT',
+      syscall: 'connect',
+      address: '159.41.196.50',
+      port: 27017
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: connect ETIMEDOUT 159.41.196.50:27017
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async AggregationCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\aggregation_cursor.js:57:26)
+    at async AggregationCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async AggregationCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async AggregationCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ETIMEDOUT 159.41.196.50:27017
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: connect ETIMEDOUT 159.41.196.50:27017
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+      errno: -4039,
+      code: 'ETIMEDOUT',
+      syscall: 'connect',
+      address: '159.41.196.50',
+      port: 27017
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: connect ETIMEDOUT 159.41.196.50:27017
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async AggregationCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\aggregation_cursor.js:57:26)
+    at async AggregationCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async AggregationCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async AggregationCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ETIMEDOUT 159.41.196.50:27017
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: connect ETIMEDOUT 159.41.196.50:27017
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16) {
+      errno: -4039,
+      code: 'ETIMEDOUT',
+      syscall: 'connect',
+      address: '159.41.196.50',
+      port: 27017
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async AggregationCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\aggregation_cursor.js:57:26)
+    at async AggregationCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async AggregationCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async AggregationCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: PoolClearedError [MongoPoolClearedError]: Connection pool for ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017 was cleared because another operation failed with: "connection 90 to 159.41.196.50:27017 closed"
+    at ConnectionPool.processWaitQueue (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection_pool.js:449:82)
+    at ConnectionPool.clear (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection_pool.js:243:14)
+    at updateServers (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:518:29)
+    at Topology.serverUpdateHandler (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:394:9)
+    at Server.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:501:77)
+    at Server.emit (node:events:508:28)
+    at markServerUnknown (D:\solarshare\backend\node_modules\mongodb\lib\sdam\server.js:358:12)
+    at Server.handleError (D:\solarshare\backend\node_modules\mongodb\lib\sdam\server.js:249:17)
+    at D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection_pool.js:395:25 {
+  errorLabelSet: Set(1) { 'PoolRequstedRetry' },
+  beforeHandshake: false,
+  address: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017',
+  [cause]: MongoNetworkError: connection 90 to 159.41.196.50:27017 closed
+      at Connection.onClose (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:120:22)
+      at TLSSocket.emit (node:events:520:35)
+      at node:net:346:12
+      at TCP.done (node:_tls_wrap:649:7) {
+    errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+    beforeHandshake: false,
+    connectionGeneration: 73,
+    [cause]: undefined
+  }
+}
+Backend Route Error: MongoNetworkError: connection 90 to 159.41.196.50:27017 closed
+    at Connection.onClose (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:120:22)
+    at TLSSocket.emit (node:events:520:35)
+    at node:net:346:12
+    at TCP.done (node:_tls_wrap:649:7) {
+  errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+  beforeHandshake: false,
+  connectionGeneration: 73,
+  [cause]: undefined
+}
+Backend Route Error: PoolClearedError [MongoPoolClearedError]: Connection pool for ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017 was cleared because another operation failed with: "connection 90 to 159.41.196.50:27017 closed"
+    at ConnectionPool.processWaitQueue (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection_pool.js:449:82)
+    at ConnectionPool.clear (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection_pool.js:243:14)
+    at updateServers (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:518:29)
+    at Topology.serverUpdateHandler (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:394:9)
+    at Server.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:501:77)
+    at Server.emit (node:events:508:28)
+    at markServerUnknown (D:\solarshare\backend\node_modules\mongodb\lib\sdam\server.js:358:12)
+    at Server.handleError (D:\solarshare\backend\node_modules\mongodb\lib\sdam\server.js:249:17)
+    at D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection_pool.js:395:25 {
+  errorLabelSet: Set(1) { 'PoolRequstedRetry' },
+  beforeHandshake: false,
+  address: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017',
+  [cause]: MongoNetworkError: connection 90 to 159.41.196.50:27017 closed
+      at Connection.onClose (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:120:22)
+      at TLSSocket.emit (node:events:520:35)
+      at node:net:346:12
+      at TCP.done (node:_tls_wrap:649:7) {
+    errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+    beforeHandshake: false,
+    connectionGeneration: 73,
+    [cause]: undefined
+  }
+}
+Backend Route Error: PoolClearedError [MongoPoolClearedError]: Connection pool for ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017 was cleared because another operation failed with: "connection 90 to 159.41.196.50:27017 closed"
+    at ConnectionPool.processWaitQueue (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection_pool.js:449:82)
+    at ConnectionPool.clear (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection_pool.js:243:14)
+    at updateServers (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:518:29)
+    at Topology.serverUpdateHandler (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:394:9)
+    at Server.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:501:77)
+    at Server.emit (node:events:508:28)
+    at markServerUnknown (D:\solarshare\backend\node_modules\mongodb\lib\sdam\server.js:358:12)
+    at Server.handleError (D:\solarshare\backend\node_modules\mongodb\lib\sdam\server.js:249:17)
+    at D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection_pool.js:395:25 {
+  errorLabelSet: Set(1) { 'PoolRequstedRetry' },
+  beforeHandshake: false,
+  address: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017',
+  [cause]: MongoNetworkError: connection 90 to 159.41.196.50:27017 closed
+      at Connection.onClose (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:120:22)
+      at TLSSocket.emit (node:events:520:35)
+      at node:net:346:12
+      at TCP.done (node:_tls_wrap:649:7) {
+    errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+    beforeHandshake: false,
+    connectionGeneration: 73,
+    [cause]: undefined
+  }
+}
+Backend Route Error: PoolClearedError [MongoPoolClearedError]: Connection pool for ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017 was cleared because another operation failed with: "connection 90 to 159.41.196.50:27017 closed"
+    at ConnectionPool.processWaitQueue (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection_pool.js:449:82)
+    at ConnectionPool.clear (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection_pool.js:243:14)
+    at updateServers (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:518:29)
+    at Topology.serverUpdateHandler (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:394:9)
+    at Server.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:501:77)
+    at Server.emit (node:events:508:28)
+    at markServerUnknown (D:\solarshare\backend\node_modules\mongodb\lib\sdam\server.js:358:12)
+    at Server.handleError (D:\solarshare\backend\node_modules\mongodb\lib\sdam\server.js:249:17)
+    at D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection_pool.js:395:25 {
+  errorLabelSet: Set(1) { 'PoolRequstedRetry' },
+  beforeHandshake: false,
+  address: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017',
+  [cause]: MongoNetworkError: connection 90 to 159.41.196.50:27017 closed
+      at Connection.onClose (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:120:22)
+      at TLSSocket.emit (node:events:520:35)
+      at node:net:346:12
+      at TCP.done (node:_tls_wrap:649:7) {
+    errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+    beforeHandshake: false,
+    connectionGeneration: 73,
+    [cause]: undefined
+  }
+}
+Backend Route Error: MongoNetworkError: connection 89 to 159.41.196.50:27017 closed
+    at Connection.onClose (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:120:22)
+    at TLSSocket.emit (node:events:520:35)
+    at node:net:346:12
+    at TCP.done (node:_tls_wrap:649:7) {
+  errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+  beforeHandshake: false,
+  connectionGeneration: 73,
+  [cause]: undefined
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async AggregationCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\aggregation_cursor.js:57:26)
+    at async AggregationCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async AggregationCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async AggregationCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async AggregationCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\aggregation_cursor.js:57:26)
+    at async AggregationCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async AggregationCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async AggregationCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async AggregationCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\aggregation_cursor.js:57:26)
+    at async AggregationCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async AggregationCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async AggregationCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async AggregationCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\aggregation_cursor.js:57:26)
+    at async AggregationCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async AggregationCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async AggregationCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: connection 109 to 159.41.196.50:27017 closed
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connection 109 to 159.41.196.50:27017 closed
+      at Connection.onClose (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:120:22)
+      at TLSSocket.emit (node:events:520:35)
+      at node:net:346:12
+      at TCP.done (node:_tls_wrap:649:7) {
+    errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+    beforeHandshake: false,
+    connectionGeneration: 89,
+    [cause]: undefined
+  }
+}
+Backend Route Error: MongoServerSelectionError: connection 109 to 159.41.196.50:27017 closed
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connection 109 to 159.41.196.50:27017 closed
+      at Connection.onClose (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:120:22)
+      at TLSSocket.emit (node:events:520:35)
+      at node:net:346:12
+      at TCP.done (node:_tls_wrap:649:7) {
+    errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+    beforeHandshake: false,
+    connectionGeneration: 89,
+    [cause]: undefined
+  }
+}
+Backend Route Error: MongoServerSelectionError: connection 109 to 159.41.196.50:27017 closed
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at process.processTimers (node:internal/timers:540:9)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connection 109 to 159.41.196.50:27017 closed
+      at Connection.onClose (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:120:22)
+      at TLSSocket.emit (node:events:520:35)
+      at node:net:346:12
+      at TCP.done (node:_tls_wrap:649:7) {
+    errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+    beforeHandshake: false,
+    connectionGeneration: 89,
+    [cause]: undefined
+  }
+}
+Backend Route Error: MongoServerSelectionError: connection 109 to 159.41.196.50:27017 closed
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connection 109 to 159.41.196.50:27017 closed
+      at Connection.onClose (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:120:22)
+      at TLSSocket.emit (node:events:520:35)
+      at node:net:346:12
+      at TCP.done (node:_tls_wrap:649:7) {
+    errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+    beforeHandshake: false,
+    connectionGeneration: 89,
+    [cause]: undefined
+  }
+}
+Backend Route Error: MongoServerSelectionError: connection 109 to 159.41.196.50:27017 closed
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connection 109 to 159.41.196.50:27017 closed
+      at Connection.onClose (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:120:22)
+      at TLSSocket.emit (node:events:520:35)
+      at node:net:346:12
+      at TCP.done (node:_tls_wrap:649:7) {
+    errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+    beforeHandshake: false,
+    connectionGeneration: 89,
+    [cause]: undefined
+  }
+}
+Backend Route Error: MongoServerSelectionError: connection 109 to 159.41.196.50:27017 closed
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connection 109 to 159.41.196.50:27017 closed
+      at Connection.onClose (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:120:22)
+      at TLSSocket.emit (node:events:520:35)
+      at node:net:346:12
+      at TCP.done (node:_tls_wrap:649:7) {
+    errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+    beforeHandshake: false,
+    connectionGeneration: 89,
+    [cause]: undefined
+  }
+}
+Backend Route Error: MongoNetworkError: connection 125 to 159.41.196.50:27017 closed
+    at Connection.onClose (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connection.js:120:22)
+    at TLSSocket.emit (node:events:520:35)
+    at node:net:346:12
+    at TCP.done (node:_tls_wrap:649:7) {
+  errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+  beforeHandshake: false,
+  connectionGeneration: 92,
+  [cause]: undefined
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:196:22)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async FindCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\find_cursor.js:62:26)
+    at async FindCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async FindCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async FindCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17)
+    at async [Symbol.asyncIterator] (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:250:34)
+    at async FindCursor.toArray (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
+    at async model.Query._find (D:\solarshare\backend\node_modules\mongoose\lib\query.js:2430:14) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
+Backend Route Error: MongoServerSelectionError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+    at Topology.selectServer (D:\solarshare\backend\node_modules\mongodb\lib\sdam\topology.js:327:38)
+    at runNextTicks (node:internal/process/task_queues:65:5)
+    at listOnTimeout (node:internal/timers:569:9)
+    at process.processTimers (node:internal/timers:543:7)
+    at async tryOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:148:18)
+    at async executeOperation (D:\solarshare\backend\node_modules\mongodb\lib\operations\execute_operation.js:78:16)
+    at async AggregationCursor._initialize (D:\solarshare\backend\node_modules\mongodb\lib\cursor\aggregation_cursor.js:57:26)
+    at async AggregationCursor.cursorInit (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:632:27)
+    at async AggregationCursor.fetchBatch (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:666:13)
+    at async AggregationCursor.next (D:\solarshare\backend\node_modules\mongodb\lib\cursor\abstract_cursor.js:342:17) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'ReplicaSetNoPrimary',
+    servers: Map(3) {
+      'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-00.la8vkeb.mongodb.net:27017' => [ServerDescription],
+      'ac-sgdtxd1-shard-00-02.la8vkeb.mongodb.net:27017' => [ServerDescription]
+    },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: 'atlas-xv6b17-shard-0',
+    maxElectionId: new ObjectId('7fffffff000000000000014a'),
+    maxSetVersion: 372,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: 30
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+      at TLSSocket.<anonymous> (D:\solarshare\backend\node_modules\mongodb\lib\cmap\connect.js:286:44)
+      at Object.onceWrapper (node:events:623:26)
+      at TLSSocket.emit (node:events:508:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: Error: getaddrinfo ENOTFOUND ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net
+        at GetAddrInfoReqWrap.onlookupall [as oncomplete] (node:dns:122:26) {
+      errno: -3008,
+      code: 'ENOTFOUND',
+      syscall: 'getaddrinfo',
+      hostname: 'ac-sgdtxd1-shard-00-01.la8vkeb.mongodb.net'
+    }
+  }
+}
